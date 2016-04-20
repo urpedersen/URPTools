@@ -3,7 +3,7 @@ A program to perform a 2D computations of a lattice gas by [Ulf R. Pedersen](htt
 
 ## Build 
 This program uses the [boost c++ library](http://www.boost.org). Get it on Debian with:
-```bash
+```
     apt-get install libboost-all-dev
 ```
 
@@ -14,11 +14,12 @@ Type
 to generate an executable into the bin library.
 
 ## Usage
-```bash
+```
 make
 cd Examples
+nano input.cfg
 ../bin/lattice_gas | tee lattice_gas.log 
 ../Tools/make_movie.sh
 ../Tools/cleanup.sh
 ```
-Use the -h flag for help.
+Use the -h flag for additional help.
