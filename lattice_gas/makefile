@@ -3,5 +3,5 @@ all: src/lattice_gas.cc
 	g++ -O3 ./src/lattice.h ./src/lattice.cc ./src/lattice_gas.cc -lboost_iostreams -o ./bin/lattice_gas
 
 clean: 
-	rm ./bin/make_lattice
+	rm ./bin/lattice_gas
 	rmdir bin
