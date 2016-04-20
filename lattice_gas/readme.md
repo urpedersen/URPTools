@@ -19,7 +19,7 @@ make
 cd Examples
 nano input.cfg
 ../bin/lattice_gas | tee lattice_gas.log 
-../Tools/make_movie.sh
-../Tools/cleanup.sh
+sh ../Tools/make_movie.sh
+sh ../Tools/cleanup.sh
 ```
 Use the -h flag for additional help.
