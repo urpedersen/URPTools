@@ -17,7 +17,6 @@ to generate an executable into the bin library.
 ```
 make
 cd Examples
-nano input.cfg
 ../bin/lattice_gas | tee lattice_gas.log 
 sh ../Tools/make_movie.sh
 sh ../Tools/cleanup.sh
