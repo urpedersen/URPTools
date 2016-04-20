@@ -3,10 +3,11 @@ Implementation of the MBAR algorithm for reweighing of probability distributions
 Please read [Shirts and Chodera, J. Chem. Phys. 129, 124105 (2008); doi:10.1063/1.2978177] for details on the MBAR algorithm.
 
 ## Build
+Just type
 ```
 make
 ```
-(this program has no dependencies)
+This program has no library dependencies.
 
 ## Usage
 The program reads files from a set of umbrella simulations with harmonic bias potentials U_umbrella=0.5*kappa*(Q-a). The meta information for the umbrella windows is in a file named mbar_window_info.txt that should look something like this:
