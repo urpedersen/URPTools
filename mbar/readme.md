@@ -33,7 +33,7 @@ Usage example:
 ```
 make
 cd Examples
-../bin/mbar --verbose=10 | mbar.log
+../bin/mbar --verbose=10 | tee mbar.log
 xmgrace log_probability.dat.
 ```
 The output has more information on usage of the program (set --verbose=5 or --verbose=0 to hide some or all of this information).
