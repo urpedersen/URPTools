@@ -1,3 +1,6 @@
 # URPTools
 This is a bunch of (linux) tools for numerical condensed matter computations.
-Please feel free to write me, [Ulf R. Pedersen](http://urp.dk), for bugs or suggenstions.
+Feel free to write me for bugs or suggenstions.
+And I would be happer to hear if you make use of these programs.
+
+  - [Ulf R. Pedersen](http://urp.dk)
