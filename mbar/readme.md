@@ -10,7 +10,7 @@ make
 This program has no library dependencies.
 
 ## Usage
-The program reads files from a set of umbrella simulations with harmonic bias potentials U_umbrella=0.5*kappa*(Q-a). The meta information for the umbrella windows is in a file named mbar_window_info.txt that should look something like this:
+The program reads files from a set of umbrella simulations with harmonic bias potentials U_u=0.5*kappa*(Q-a)^2. The meta information for the umbrella windows is in a file named mbar_window_info.txt that should look something like this:
 ```
 NOumbrella.dat 2.5 0.0 0.0 
 umbrella01.dat 2.5 1.0 0.2
@@ -37,4 +37,31 @@ cd Examples
 ../bin/mbar --verbose=10 | tee mbar.log
 xmgrace log_probability.dat.
 ```
-The output has more information on usage of the program (set --verbose=5 or --verbose=0 to hide some or all of this information).
+The output has more information on usage of the program. Set --verbose=5 or --verbose=0 to hide some or all of this information. Warnings outputs lists parameters that are set to default values by the program.
+
+#### Mulitdimentional umbrella sampling
+The program can be used for multidimentional along several ordeparamenters:  U_u = 0.5*\kappa_0 (Q_0-a_0)^2 + 0.5*\kappa_1 (Q_1-a_1)^2 + ...
+
+For two umbrellas run the progran like this
+```
+../bin/mbar --number_of_window_dimensions=2 --number_of_observable_dimensions=2
+```
+
+The mbar_window_info.txt should look like this:  
+```
+NOumbrella.dat 2.5 0.0 0.0 0.0 0.0 
+umbrella01.dat 2.5 1.0 0.2 1.0 0.2
+umbrella02.dat 2.5 2.0 0.2 1.0 0.2
+umbrella03.dat 2.5 1.0 0.2 2.0 0.2
+umbrella04.dat 2.5 2.0 0.2 2.0 0.2
+```
+and the files with simulation data should look like this
+```
+4 2 4 5
+6 3 4 5
+7 5 3 4
+9 6 5 3
+3 7 4 5
+3 8 3 5
+```
+Where the first two columns are umbrella orderparameters, and the last two columns are observables to be reweighted.
