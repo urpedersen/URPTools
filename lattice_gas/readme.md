@@ -4,7 +4,7 @@ A program to perform a 2D computations of a lattice gas by [Ulf R. Pedersen](htt
 ## Build 
 This program uses the [boost c++ library](http://www.boost.org). Get it on Debian with:
 ```
-    apt-get install libboost-all-dev
+    sudo apt-get install libboost-all-dev
 ```
 
 Type
