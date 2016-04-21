@@ -1,6 +1,5 @@
 # mbar
-Implementation of the iterative MBAR algorithm for reweighing of a series of umbrella sampling computations.
-Read [Shirts and Chodera, J. Chem. Phys. 129, 124105 (2008)](http://dx.doi.org/10.1063/1.2978177) for details on the MBAR algorithm.
+Implementation of the iterative MBAR algorithm for reweighing of a series of umbrella sampling computations, thus related to the weighted histogram analysis method (WHAM). Read [Shirts and Chodera, J. Chem. Phys. 129, 124105 (2008)](http://dx.doi.org/10.1063/1.2978177) for details on the MBAR algorithm.
 
 ## Build
 Just type
