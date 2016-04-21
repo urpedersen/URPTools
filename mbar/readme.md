@@ -1,6 +1,6 @@
 # mbar
-Implementation of the MBAR algorithm for reweighing of probability distributions.
-Please read [Shirts and Chodera, J. Chem. Phys. 129, 124105 (2008); doi:10.1063/1.2978177] for details on the MBAR algorithm.
+Implementation of the iterative MBAR algorithm for reweighing of a series of umbrella sampling computations.
+Read [Shirts and Chodera, J. Chem. Phys. 129, 124105 (2008)](http://dx.doi.org/10.1063/1.2978177) for details on the MBAR algorithm.
 
 ## Build
 Just type
@@ -38,6 +38,9 @@ cd Examples
 xmgrace log_probability.dat.
 ```
 The output has more information on usage of the program. Set --verbose=5 or --verbose=0 to hide some or all of this information. Warnings outputs lists parameters that are set to default values by the program.
+
+#### Rerun
+The program can read a free_energies.dat to continue a computation. A backup restart_free_energies.dat is written while the program is running. All umbrella free energies are set to zero if the free_energies.dat is not provided.
 
 #### Mulitdimentional umbrella sampling
 The program can be used for multidimentional along several ordeparamenters:  U_u = 0.5*\kappa_0 (Q_0-a_0)^2 + 0.5*\kappa_1 (Q_1-a_1)^2 + ...
