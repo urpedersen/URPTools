@@ -4,9 +4,9 @@ This program is based on the rumd_init_conf program in the [RUMD](www.rumd.org) 
 
 ## Build 
 This program uses the [boost c++ library](http://www.boost.org). 
-Get it on Debian with:
+Get it on Debian or Ubuntu with:
 ```
-apt-get install libboost-all-dev
+sudo apt-get install libboost-all-dev
 ```
 
 Type
