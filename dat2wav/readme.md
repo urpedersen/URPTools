@@ -22,7 +22,7 @@ The program expects a standard input with one float value on each line. The stre
 
 
 ## Usage examples: 
-
+```
    echo -e "0.1\n0.2\n0.3" | ./bin/dat2wav
 
    cat myData.ascii | ./bin/dat2wav -o myData.wav
@@ -34,7 +34,7 @@ The program expects a standard input with one float value on each line. The stre
    awk 'BEGIN{twopi=8.*atan2(1.,1.);for(n=0;n<48000;n++){print sin(twopi*n/48000*110*2^(7/12))}}' | ./bin/dat2wav -r 48000 -o E3.wav
 
    awk 'BEGIN{twopi=8.*atan2(1.,1.);for(n=0;n<32000;n++){print sin(twopi*n/32000*110*2^(7/12));print sin(twopi*n/32000*220*2^(7/12))}}' | ./bin/dat2wav -r 32000 -c 2 -o E3E4_stereo.wav
-
+```
 
 ## Copying
 Copyright (C) 2013 Ulf R. Pedersen (http://urp.dk). This program comes with ABSOLUTELY NO WARRANTY. 
