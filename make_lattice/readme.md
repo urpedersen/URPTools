@@ -21,3 +21,6 @@ make
 ./bin/make_lattice
 ```
 Use the -h flag for help.
+
+## Tools
+The directory Tools contains two script that converts xyz-files to the [Gromacs format](http://manual.gromacs.org/current/online/gro.html)

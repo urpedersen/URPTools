@@ -1,0 +1,44 @@
+#!/bin/bash
+#  Convert configuration from gromacs format (*.gro) to the xyz format
+#    By Ulf R. Pedersen (www.urp.dk), May 2014.
+
+if [ $# != 1 ]; then 
+    echo "Convert configuration from gromacs format (*.gro) to the xyz format." 
+    echo "Usage: $0 <filename of gromacs gro-file>" 
+    exit 1 
+fi 
+
+groFile=$1
+forename=`echo $groFile|awk -F. '{print $1}'`
+xyzFile=$forename.xyz 
+
+echo begin converting $groFile to $xyzFile
+
+if [ ! -e $groFile  ];then
+    echo "Error: the gromacs input file $groFile does not exist. Exit."
+    exit 1
+fi
+
+if [ -e $xyzFile ];then
+    echo "Error: the xyz output file $xyzFile already exist. Exit."
+    exit 1
+fi
+
+# Number of particles in first line
+N=`head -n 2 $groFile | tail -n 1`
+echo $N > $xyzFile
+
+# Comment in secound line
+head -n 1 $groFile >> $xyzFile
+
+# Coordinates
+tail -n $(( $N + 1 )) $groFile | head -n $N | awk '{
+    type=$2
+    x=$4
+    y=$5
+    z=$6
+    print type,x,y,z
+}' >> $xyzFile
+
+echo done converting $groFile to $xyzFile
+

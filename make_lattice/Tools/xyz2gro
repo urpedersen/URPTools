@@ -1,0 +1,30 @@
+#!/bin/bash
+#  Convert configuration from xyz format to gromacs format (*.gro).
+#    By Ulf R. Pedersen (www.urp.dk), June 2011.
+
+if [ $# != 4 ]; then
+   echo "Convert configuration from xyz-format to gromacs format (*.gro)."
+   echo "Usage: $0 <filename of xyz-file> <X box length> <Y box length> <Z box length>"
+   exit 1
+fi
+
+xyzFile=$1
+groFile=$1.gro
+
+# Read box lengths
+X=$2
+Y=$3
+Z=$4
+
+# Copy comment line from xyz-file to gro-file
+head -n 2 $xyzFile | tail -n 1 > $groFile
+
+# Write number of particles
+echo `head -n 1 $xyzFile` >> $groFile
+
+# Print coordinates
+awk '{if(NR>2){printf "%5i%5s%5s%5s%8.3f%8.3f%8.3f\n",NR-2,"atm",$1,NR-2,$2,$3,$4}}' $xyzFile  >> $groFile
+
+# Add box lengths
+echo $X $Y $Z >> $groFile
+
