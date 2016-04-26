@@ -9,6 +9,7 @@ This is a bunch of stand-alone (linux) tools that I during the years have made f
 | Program Name      | Brief Description                                                            |
 |-------------------|------------------------------------------------------------------------------|
 | cluster_analysis  | Perform a cluster analysis of connected nodes                                |
+| dat2wav           | Convert an input of float values to an WAV audio file                        |
 | lattice_gas       | Monte Carlo simulations of a 2D lattice gas                                  |
 | make_lattice      | Setup crystal lattices like FCC, BCC or NaCl                                 |
 | mbar              | Implimentation of the MBAR algorithm for reweighting an umbrella sampling    |
