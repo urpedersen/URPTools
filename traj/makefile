@@ -1,7 +1,7 @@
 CC=g++
 FLAGS=-O3 -Wall
 
-all: traj_msd traj_gr traj_water traj_lwotp
+all: traj_msd traj_gr traj_Fs traj_water traj_lwotp
 
 traj_msd:
 	mkdir -p ./bin
@@ -10,6 +10,10 @@ traj_msd:
 traj_gr:
 	mkdir -p ./bin
 	$(CC) $(CFLAGS) ./src/traj_gr.cpp -o ./bin/traj_gr
+
+traj_Fs:
+	mkdir -p ./bin
+	$(CC) $(CFLAGS) ./src/traj_Fs.cpp -o ./bin/traj_Fs
 
 traj_water:
 	mkdir -p ./bin

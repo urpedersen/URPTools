@@ -3,5 +3,6 @@ Programs for computing static and dynamic quantities of Molecular Dynamics traje
 
  - traj_msd   : computes mean square displacement of a single component
  - traj_rdf   : computed the radial distribution function of a single component
+ - traj_Fs    : computed the intermediate scattering function Fs(t) for a given q vector
  - traj_water : analyse a water trejectorie
  - traj_lwopt : analyse trejectories of triangular molecules like the the LWOTP model
