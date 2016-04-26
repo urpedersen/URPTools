@@ -6,18 +6,23 @@ Convert data stream into an audio file in the uncompressed PCM WAV format (out.w
 The program expects a standard input with one float value on each line. The stream should be ended with EOF (ctrl-d). The input data is rescaled so the volume of the wav-output is adjusted to the range of the input. Optional flags are:
 
  -h or --help
+ 
      Print this help message.
 
  -o [output filename]
+ 
      Default: out.wav
 
  -r [sample rate in Hz]
+ 
      Default: 44100. Recommended values are 96000, 48000, 44100, 32000, 22050, 16000, 11025 or 8000.
 
  -b [bits per sample]
+ 
      Default: 16. Accepted values are 8, 16 or 32.
 
  -c [number of channels]
+ 
      Default: 1. Use 2 for stereo. Stereo input is given as L1 R1 L2 R2 L3 R3 ... etc.
 
 
