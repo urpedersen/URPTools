@@ -30,7 +30,7 @@ int main(int argc,char* argv[]) {
    for (int i = 1; i < argc; i++) {
       if(string(argv[i])=="-h" || string(argv[i])=="--help"){
 	      cout << endl 
-		      << "   data2wav v0.2 - convert data stream into an audio file in the uncompressed PCM WAV format (out.wav)" << endl <<  endl
+		      << "   dat2wav v0.2 - convert data stream into an audio file in the uncompressed PCM WAV format (out.wav)" << endl <<  endl
 		      << "Usage:"<< endl << endl
 		      << "   The program expects a standard input with one float value on each line. The stream should be ended with EOF (ctrl-d). The input data is rescaled so the volume of the wav-output is adjusted to the range of the input. Optional flags are:" << endl << endl
           << " -h or --help" << endl
