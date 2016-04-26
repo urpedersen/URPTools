@@ -44,7 +44,7 @@ int main(int argc,char* argv[]) {
 		      << " -c [number of channels]" << endl
           << "     Default: 1. Use 2 for stereo. Stereo input is given as L1 R1 L2 R2 L3 R3 ... etc." << endl
 		      << endl << endl
-		      << "Examples: " << endl << endl
+		      << "Usage examples: " << endl << endl
                       << "   echo -e \"0.1\\n0.2\\n0.3\" | " << argv[0] << endl << endl
 		      << "   cat myData.ascii | " << argv[0] << " -o myData.wav" << endl << endl
                       << "   paste left.dat right.dat | awk '{print $1;print $2}'  | " << argv[0] << " -c 2 -o stereo.wav" << endl << endl
