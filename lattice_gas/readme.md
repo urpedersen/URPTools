@@ -13,7 +13,7 @@ Type
 ```
 to generate an executable into the bin library.
 
-## Usage
+## Usage example
 ```
 make
 cd Examples
@@ -21,4 +21,4 @@ cd Examples
 sh ../Tools/make_movie.sh
 sh ../Tools/cleanup.sh
 ```
-Use the -h flag for additional help.
+The file input.cfg contains the setting for this computations. Use the -h flag for additional help.
