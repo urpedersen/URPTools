@@ -20,6 +20,7 @@ Usage 3D-mode:              ./bin/xyz2sofq [XYZ file] [X] [Y] [Z] [X_pixels] [Y_
 Notes:
          The type in xyz file must be a integer
 ```
+Run program without parameters to get the above help message.
 
 ## Usage examples
 ```
