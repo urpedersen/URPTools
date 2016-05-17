@@ -14,3 +14,16 @@ This is a bunch of stand-alone (linux) tools that I during the years have made f
 | make_lattice      | Setup crystal lattices like FCC, BCC or NaCl                                 |
 | mbar              | Implimentation of the MBAR algorithm for reweighting an umbrella sampling    |
 | traj              | Programs for analysing molecular dynamics trajectories                       |
+
+## Download and build (linux)
+1. Clone and navigate to the git repository
+```sh
+git clone https://github.com/urpedersen/URPTools.git
+cd URPTools
+```
+
+2. Move into a program directory and read about how to build and usage
+```sh
+cd PROGRAM
+cat readme.md
+```
