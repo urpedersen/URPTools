@@ -23,7 +23,7 @@ to build. The executable program named Q6 is located in
 
 ### Usage examples:
 ```
-./bin/Q6 --input=input.xyz --Lenghts=15.0,15.0.30.0
+./bin/Q6 --input=input.xyz --Lenghts=15.0,15.0,30.0
 ./bin/Q6 -i bcc.xyz -L 15.0 -r 1.5 -l 4 -o Q4.xyz
 
 Optional flags:     [default]
