@@ -108,10 +108,10 @@ void Rotational_order::compute_ql(unsigned in_degree){
 					dy-=Ly*nearbyint(dy/Ly);
 					dz-=Lz*nearbyint(dz/Lz);
 					double r=sqrt(dx*dx+dy*dy+dz*dz);
-					double phi=atan2(dy,dx);       // goes from 0 to 2pi
-					if(phi<0) phi+=2.*pi;   // acos(-1.)=pi=3.1415...
-					double theta=acos(dz/r);       // goes from 0 to pi
 					if(r<neighbour_cutoff){
+						double phi=atan2(dy,dx);        // goes from 0 to 2pi
+							if(phi<0) phi+=2.*pi;
+						double theta=acos(dz/r);        // goes from 0 to pi
 						num_bonds++;
 	//if(m==0)
 	//	cout << "i=" << i << " j=" << j << " r= " << r << "  " << "phi= " << phi << " theta= " << theta << endl; 
@@ -153,7 +153,7 @@ void Rotational_order::compute_ql(unsigned in_degree){
 				dy-=Ly*nearbyint(dy/Ly);
 				dz-=Lz*nearbyint(dz/Lz);
 				double r=sqrt(dx*dx+dy*dy+dz*dz);
-				int index = (int)j*(2*(int)degree+1)*2;
+				unsigned index = (int)j*(2*(int)degree+1)*2;
 				index+=2*(m+(int)degree);
 				if(r<neighbour_cutoff && i!=j){
 					num_bonds++;
@@ -177,6 +177,55 @@ void Rotational_order::compute_ql(unsigned in_degree){
 	}// Done looping particles
 }
 
+void Rotational_order::compute_Sij(double S_min,string filename){
+	
+	ofstream out;
+	out.open(filename.c_str());
+	if(!out.is_open()){
+		cout << "error: could not open " << filename << " for writing Sij matrix";
+		abort();
+	}
+	out << number_of_particles() << endl;
+	out << "List of connected particles using Sij > " << S_min << endl;
+	
+	for(unsigned i=0;i<number_of_particles();i++){
+		for(unsigned j=0;j<number_of_particles();j++){
+			double dx=x.at(j)-x.at(i);
+			double dy=y.at(j)-y.at(i);
+			double dz=z.at(j)-z.at(i);
+			dx-=Lx*nearbyint(dx/Lx);
+			dy-=Ly*nearbyint(dy/Ly);
+			dz-=Lz*nearbyint(dz/Lz);
+			double r=sqrt(dx*dx+dy*dy+dz*dz);
+			if(i!=j && r<neighbour_cutoff){
+				double Sij_real=0;
+				double Sij_imag=0;
+				for(int m=(-1)*(int)degree;m<(int)degree+1;m++){
+					unsigned index = (int)i*(2*(int)degree+1)*2;
+					index+=2*(m+(int)degree);
+					unsigned jndex = (int)j*(2*(int)degree+1)*2;
+					jndex+=2*(m+(int)degree);
+					/*double qlm_i_real=qlm.at(index);
+					double qlm_i_imag=qlm.at(index+1);
+					double qlm_j_real=qlm.at(jndex);
+					double qlm_j_imag=qlm.at(jndex+1);*/
+					double qlm_i_real=qlmAvg.at(index);
+					double qlm_i_imag=qlmAvg.at(index+1);
+					double qlm_j_real=qlmAvg.at(jndex);
+					double qlm_j_imag=qlmAvg.at(jndex+1);
+					Sij_real+=qlm_i_real*qlm_j_real+qlm_i_imag*qlm_j_imag;
+					Sij_imag+=-qlm_i_real*qlm_j_imag+qlm_i_imag*qlm_j_real;
+				}
+				if(Sij_real>S_min){
+					//cout << "S( " << i << " , " << j << " ) = " << Sij_real << " + i " << Sij_imag << endl;
+					out << i << " " << j << " # " << Sij_real << " + i " << Sij_imag << endl;
+
+				}
+			}
+		}
+	}
+	out.close();
+}
 
 /**
  * Return the number of particles

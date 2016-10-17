@@ -13,7 +13,9 @@ This is a bunch of stand-alone (linux) tools that I during the years have made f
 | lattice_gas       | Monte Carlo simulations of a 2D lattice gas                                  |
 | make_lattice      | Setup crystal lattices like FCC, BCC or NaCl                                 |
 | mbar              | Implimentation of the MBAR algorithm for reweighting an umbrella sampling    |
+| rotational_order  | Computes the Steinhard Q6 order-parameter, and the Lechner-Dellago version   |
 | traj              | Programs for analysing molecular dynamics trajectories                       |
+
 
 ## Download and build (linux)
 1. Clone and navigate to the git repository

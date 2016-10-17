@@ -38,6 +38,7 @@ int main(int argc, char **argv) {
 	double Lx=10,Ly=10,Lz=10;
 	double neighbour_cutoff=1.4;
 	string ofilename = "Q6.xyz";
+	double Sij_min=-1.0;
 
 	// Handle command line options
 	vector<string> vecstr;
@@ -50,11 +51,12 @@ int main(int argc, char **argv) {
 				{"input",	optional_argument, 0, 'i'},
 				{"Lengths",	optional_argument, 0, 'L'},
 				{"rcut",	optional_argument, 0, 'r'},
+				{"Sij",		optional_argument, 0, 'S'},
 				{"output",	optional_argument, 0, 'o'},
 				{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		c = getopt_long (argc, argv, "hql:i:L:r:o:",long_options,&option_index);
+		c = getopt_long (argc, argv, "hql:i:L:r:S:o:",long_options,&option_index);
 		if(c==-1) break;
 		switch (c) {
 		/*case 0:
@@ -78,8 +80,10 @@ int main(int argc, char **argv) {
 			cout << " -l, --l=INT        [6]         The degree of the bond rotational-order." << endl;
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
 			cout << " -i, --input=FILE   [input.xyz] Input file (*.xyz or *.xyz.gz)." << endl;
-			cout << " -L, --Lenghts=NUM  [10]       Size of periodic box." << endl; 
+			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box." << endl; 
 			cout << "     --Lenghts=NUM,NUM,NUM "  << endl;
+			cout << " -S, --Sij=NUM      [-1.0]       Min threshold values for the Sij connection matrix." << endl;
+			cout << "                                Default value -1.0 to skip computation. A sparse matrix is written to node_connections.dat" << endl; 
 			cout << " -o, --output=FILE  [Q6.xyz]    Output file (*.xyz or *.xyz.gz)." << endl;
 			exit(0);
 			break;
@@ -110,6 +114,9 @@ int main(int argc, char **argv) {
 				abort();
 			}
 			break;
+		case 'S':
+			Sij_min=atof(optarg);
+			break;
 		case 'o':
 			ofilename = optarg;
 			break;
@@ -130,6 +137,11 @@ int main(int argc, char **argv) {
 	rot.load_xyz(ifilename,Lx,Ly,Lz,neighbour_cutoff);
 	rot.compute_ql(degree);
 	rot.write_xyz(ofilename);
+	if(Sij_min>-1.0) {
+		rot.compute_Sij(Sij_min,"node_connections.dat");
+		if(!quiet)
+			cout << "Wrote Sij matrix to node_connections.dat." << endl;
+	}
 
 	// Say goodby to the nice user (unless you are asked to be quiet). 
 	if(!quiet){
