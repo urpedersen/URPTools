@@ -136,12 +136,12 @@ int main(int argc, char **argv) {
 	Rotational_order rot;
 	rot.load_xyz(ifilename,Lx,Ly,Lz,neighbour_cutoff);
 	rot.compute_ql(degree);
-	rot.write_xyz(ofilename);
 	if(Sij_min>-1.0) {
 		rot.compute_Sij(Sij_min,"node_connections.dat");
 		if(!quiet)
 			cout << "Wrote Sij matrix to node_connections.dat." << endl;
 	}
+	rot.write_xyz(ofilename);
 
 	// Say goodby to the nice user (unless you are asked to be quiet). 
 	if(!quiet){

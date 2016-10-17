@@ -46,6 +46,7 @@ Rotational_order::Rotational_order() :
 		y(),
 		z(),
 		number_of_neighbors(),
+		number_of_S_connections(),
 		qlm(),
 		qi(),
 		qlmAvg(),
@@ -189,6 +190,7 @@ void Rotational_order::compute_Sij(double S_min,string filename){
 	out << "List of connected particles using Sij > " << S_min << endl;
 	
 	for(unsigned i=0;i<number_of_particles();i++){
+		unsigned num_connections=0;
 		for(unsigned j=0;j<number_of_particles();j++){
 			double dx=x.at(j)-x.at(i);
 			double dy=y.at(j)-y.at(i);
@@ -218,11 +220,12 @@ void Rotational_order::compute_Sij(double S_min,string filename){
 				}
 				if(Sij_real>S_min){
 					//cout << "S( " << i << " , " << j << " ) = " << Sij_real << " + i " << Sij_imag << endl;
-					out << i << " " << j << " # " << Sij_real << " + i " << Sij_imag << endl;
-
+					out << i << " " << j << " # S = " << Sij_real << "  r = " << r << endl;
+					num_connections++;
 				}
 			}
 		}
+		number_of_S_connections.push_back(num_connections);
 	}
 	out.close();
 }
@@ -381,12 +384,14 @@ void Rotational_order::write_xyz(string ofilename){
 	out << this->number_of_particles()<<endl;
 	out << " numTypes=" << number_of_types();
 	out << " sim_box=RectangularSimulationBox," << Lx << "," << Ly << "," << Lz;
-	out << " columns=type,x,y,z,Ni,ql,qlAvg " << endl;
+	out << " columns=type,x,y,z,Ni,ql,qlAvg,Ns " << endl;
 	for (unsigned i=0;i<number_of_particles();i++) {
 		out << type.at(i); 
 		out << " " << x.at(i)  << " " << y.at(i) << " " << z.at(i);
 		out << " " << number_of_neighbors.at(i);
 		out << " " << qi.at(i) << " " << qiAvg.at(i);
+		if(number_of_S_connections.size()==number_of_particles())
+			out << " " << number_of_S_connections.at(i);
 		out << endl;
 	}
 }
@@ -421,6 +426,7 @@ string Rotational_order::info(){
 	out << " qi.size()= " << qi.size() << " qiAvg.size()= " << qiAvg.size() <<endl;
 	out << " qlm.size()= " << qlm.size() << " qlmAvg.size()= " << qlmAvg.size() <<endl;
 	out << " number_of_neighbors.size()= " << number_of_neighbors.size() <<endl;
+	out << " number_of_S_connections.size()= " << number_of_S_connections.size() <<endl;
 
 	return out.str();
 }

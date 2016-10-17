@@ -18,6 +18,7 @@ private:
 	vector<double> y;
 	vector<double> z;
 	vector<unsigned> number_of_neighbors;
+	vector<unsigned> number_of_S_connections;
 	vector<double> qlm;
 	vector<double> qi;
 	vector<double> qlmAvg;
