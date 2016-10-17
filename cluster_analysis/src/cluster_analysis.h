@@ -69,6 +69,7 @@ public:
 	void create_cluster();
 
 	int get_mass_of_largest_cluster();
+	int get_index_of_largest_cluster();
 
 	void print();
 };
@@ -249,12 +250,33 @@ int Cluster_analysis::get_mass_of_largest_cluster(){
 	return out;
 }
 
+/**
+ * Return the index of largest cluster.
+ */
+int Cluster_analysis::get_index_of_largest_cluster(){
+
+	unsigned int out=0;
+	unsigned int size=0;
+	
+	for (unsigned int i = 0 ; i < clusters.size() ; i++ )
+		if ( clusters[i]->nodes.size() > size ){
+			size = clusters[i]->nodes.size();
+			out=i;
+		}
+	;
+
+	return out;
+}
+
+
+
 void Cluster_analysis::print ( ) {
 	if(verbose>4){
 
 		cout << "Number of nodes: " << nodes.size() << endl;
 		cout << "Number of clusters: " << clusters.size() << endl;
-		cout << "Largest cluster: " << get_mass_of_largest_cluster() << endl;
+		cout << "Mass of largest cluster: " << get_mass_of_largest_cluster() << endl;
+		cout << "Index of largest cluster: " << get_index_of_largest_cluster() << endl;
 
 		if(verbose>5){
 			for(unsigned int i=0; i<clusters.size() ; i++ )
