@@ -100,7 +100,11 @@ void Rotational_order::compute_ql(unsigned in_degree){
 			unsigned num_bonds=0;
 			double this_qlm_real=0;
 			double this_qlm_imag=0;
-			for(unsigned j=0;j<number_of_particles();j++){
+			vector<unsigned> n;
+			cell_list.neighbors(i,n);
+			//for(unsigned j=0;j<number_of_particles();j++){ // N^2 loop
+			for(unsigned in=0;in<n.size();in++){
+				unsigned j=n.at(in);
 				if(i!=j){
 					double dx=x.at(j)-x.at(i);
 					double dy=y.at(j)-y.at(i);
@@ -146,7 +150,11 @@ void Rotational_order::compute_ql(unsigned in_degree){
 			unsigned num_bonds=0;
 			double this_qlm_real=0;
 			double this_qlm_imag=0;
-			for(unsigned j=0;j<number_of_particles();j++){
+			vector<unsigned> n;
+			cell_list.neighbors(i,n);
+			//for(unsigned j=0;j<number_of_particles();j++){ // N^2 loop
+			for(unsigned in=0;in<n.size();in++){
+				unsigned j=n.at(in);
 				double dx=x.at(j)-x.at(i);
 				double dy=y.at(j)-y.at(i);
 				double dz=z.at(j)-z.at(i);
@@ -189,9 +197,17 @@ void Rotational_order::compute_Sij(double S_min,string filename){
 	out << number_of_particles() << endl;
 	out << "List of connected particles using Sij > " << S_min << endl;
 	
+	// Build a cell list
+	Cell_list cell_list;
+	cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);	
+	
 	for(unsigned i=0;i<number_of_particles();i++){
 		unsigned num_connections=0;
-		for(unsigned j=0;j<number_of_particles();j++){
+		vector<unsigned> n;
+		cell_list.neighbors(i,n);
+		//for(unsigned j=0;j<number_of_particles();j++){ // N^2 loop
+		for(unsigned in=0;in<n.size();in++){
+			unsigned j=n.at(in);
 			double dx=x.at(j)-x.at(i);
 			double dy=y.at(j)-y.at(i);
 			double dz=z.at(j)-z.at(i);
@@ -364,8 +380,17 @@ void Rotational_order::load_xyz(string ifilename,double in_Lx,double in_Ly,doubl
  * Write coordinates of particles to xyz-file.
  */
 //void Rotational_order::write_xyz(ostream& out){}
-void Rotational_order::write_xyz(string ofilename){
+void Rotational_order::write_xyz(string ofilename,double Qmin,double Qmax){
 	using namespace boost::iostreams;
+	// Count number of particles in the allowed interval
+	unsigned numSelected = 0;
+	for (unsigned i=0;i<number_of_particles();i++) 
+		if(qiAvg.at(i)>Qmin && qiAvg.at(i)<Qmax)
+			numSelected++;
+	double Navg   = 0;for(unsigned i=0;i<number_of_particles();i++) Navg += (double)number_of_neighbors.at(i);Navg/=(double)number_of_particles();
+	double Ql    = 0;for(unsigned i=0;i<number_of_particles();i++) Ql += qi.at(i);Ql/=(double)number_of_particles();
+	double QlAvg = 0;for(unsigned i=0;i<number_of_particles();i++) QlAvg += qiAvg.at(i);QlAvg/=(double)number_of_particles();
+	
 	vector<string> fnames = rotational_order_split(ofilename,'.');
 	filtering_ostream out;
 	if(fnames.size()<2){
@@ -381,18 +406,21 @@ void Rotational_order::write_xyz(string ofilename){
 		cerr << "error: Incompatible name of output file. Should be *.xyz or *.xyz.gz" << endl;
 		abort();
 	}
-	out << this->number_of_particles()<<endl;
+	out << numSelected <<endl;
 	out << " numTypes=" << number_of_types();
 	out << " sim_box=RectangularSimulationBox," << Lx << "," << Ly << "," << Lz;
-	out << " columns=type,x,y,z,Ni,ql,qlAvg,Ns " << endl;
+	out << " columns=type,x,y,z,Ni,ql,qlAvg,Ns";
+	out << " Navg=" << Navg << " Ql=" << Ql << " QlAvg=" << QlAvg << endl; 
 	for (unsigned i=0;i<number_of_particles();i++) {
-		out << type.at(i); 
-		out << " " << x.at(i)  << " " << y.at(i) << " " << z.at(i);
-		out << " " << number_of_neighbors.at(i);
-		out << " " << qi.at(i) << " " << qiAvg.at(i);
-		if(number_of_S_connections.size()==number_of_particles())
+		if(qiAvg.at(i)>Qmin && qiAvg.at(i)<Qmax){
+			out << type.at(i); 
+			out << " " << x.at(i)  << " " << y.at(i) << " " << z.at(i);
+			out << " " << number_of_neighbors.at(i);
+			out << " " << qi.at(i) << " " << qiAvg.at(i);
+			if(number_of_S_connections.size()==number_of_particles())
 			out << " " << number_of_S_connections.at(i);
-		out << endl;
+			out << endl;
+		}
 	}
 }
 
@@ -401,8 +429,15 @@ void Rotational_order::write_xyz(string ofilename){
 /**
  * Return a string with various information about the lattice
  */
-string Rotational_order::info(){
-	double avg;
+string Rotational_order::info(double Qmin,double Qmax){
+	// Count number of particles in the allowed interval
+	unsigned numSelected = 0;
+	for (unsigned i=0;i<number_of_particles();i++) 
+		if(qiAvg.at(i)>Qmin && qiAvg.at(i)<Qmax)
+			numSelected++;
+	double Navg   = 0;for(unsigned i=0;i<number_of_particles();i++) Navg += (double)number_of_neighbors.at(i);Navg/=(double)number_of_particles();
+	double Ql    = 0;for(unsigned i=0;i<number_of_particles();i++) Ql += qi.at(i);Ql/=(double)number_of_particles();
+	double QlAvg = 0;for(unsigned i=0;i<number_of_particles();i++) QlAvg += qiAvg.at(i);QlAvg/=(double)number_of_particles();
 	
 	stringstream out;
 	out << "Total number of particles:    " << number_of_particles() << endl;
@@ -416,17 +451,18 @@ string Rotational_order::info(){
 	out << "Number density:               " << number_of_particles()/volume() << endl;
 	out << "degree:                    l= " << degree << endl;
 	out << "rcut:                     rc= " << neighbour_cutoff << endl;
-	avg = 0;for(unsigned i=0;i<number_of_particles();i++) avg += (double)number_of_neighbors.at(i);avg/=(double)number_of_particles();
-	out << "Average number of neighbors:  " << avg << endl;
-	avg = 0;for(unsigned i=0;i<number_of_particles();i++) avg += qi.at(i);avg/=(double)number_of_particles();
-	out << "Average qi:               Ql= " << avg << endl;
-	avg = 0;for(unsigned i=0;i<number_of_particles();i++) avg += qiAvg.at(i);avg/=(double)number_of_particles();
-	out << "Average qiAvg:         QlAvg= " << avg << endl;
+	out << "Average number of neighbors:  " << Navg << endl;
+	out << "Average qi:               Ql= " << Ql << endl;
+	out << "Average qiAvg:         QlAvg= " << QlAvg << endl;
+	out << "Q minimum value:        Qmin= " << Qmin << endl;
+	out << "Q maximum value:        Qmax= " << Qmax << endl;
+	out << "Number of selected par.:      " << numSelected << endl;
+	/*
 	out << "           DEBUG INFO" << endl;
 	out << " qi.size()= " << qi.size() << " qiAvg.size()= " << qiAvg.size() <<endl;
 	out << " qlm.size()= " << qlm.size() << " qlmAvg.size()= " << qlmAvg.size() <<endl;
 	out << " number_of_neighbors.size()= " << number_of_neighbors.size() <<endl;
 	out << " number_of_S_connections.size()= " << number_of_S_connections.size() <<endl;
-
+	*/
 	return out.str();
 }

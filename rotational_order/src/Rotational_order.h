@@ -43,13 +43,13 @@ public:
 	//void load_xyz(ifstream& in);
 	void  load_xyz(string ifilename,double Lx,double Ly,double Lz,double neighbour_cutoff);
 	//void write_xyz(ostream& out);
-	void write_xyz(string ofilename);
+	void write_xyz(string ofilename,double Qmin, double Qmax);
 
 	unsigned number_of_particles();
 	unsigned number_of_types();
 	unsigned number_of_particles_of_type(unsigned test_type);
 	double volume();
-	string info();
+	string info(double Qmin,double Qmax);
 };
 
 #endif // ROTATIONAL_ORDER_H

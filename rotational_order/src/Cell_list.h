@@ -34,7 +34,7 @@ public:
 		double Z,
 		double r
 	);
-	vector<unsigned> neighbors(unsigned index);
+	void neighbors(unsigned particle_index, vector<unsigned>& out);
 	string info();
 };
 

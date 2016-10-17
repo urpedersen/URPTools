@@ -38,6 +38,8 @@ int main(int argc, char **argv) {
 	double Lx=10,Ly=10,Lz=10;
 	double neighbour_cutoff=1.4;
 	string ofilename = "Q6.xyz";
+	double Qmin=0.0;
+	double Qmax=1.0;
 	double Sij_min=-1.0;
 
 	// Handle command line options
@@ -51,12 +53,13 @@ int main(int argc, char **argv) {
 				{"input",	optional_argument, 0, 'i'},
 				{"Lengths",	optional_argument, 0, 'L'},
 				{"rcut",	optional_argument, 0, 'r'},
+				{"QminQmax",	optional_argument, 0, 'Q'},
 				{"Sij",		optional_argument, 0, 'S'},
 				{"output",	optional_argument, 0, 'o'},
 				{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		c = getopt_long (argc, argv, "hql:i:L:r:S:o:",long_options,&option_index);
+		c = getopt_long (argc, argv, "hql:i:L:r:Q:S:o:",long_options,&option_index);
 		if(c==-1) break;
 		switch (c) {
 		/*case 0:
@@ -82,7 +85,9 @@ int main(int argc, char **argv) {
 			cout << " -i, --input=FILE   [input.xyz] Input file (*.xyz or *.xyz.gz)." << endl;
 			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box." << endl; 
 			cout << "     --Lenghts=NUM,NUM,NUM "  << endl;
-			cout << " -S, --Sij=NUM      [-1.0]       Min threshold values for the Sij connection matrix." << endl;
+			cout << " -Q  --QminQmax=NUM,NUM         Minimum and maximum Q6 limits" << endl;
+			cout << "                    [0.0,1.0]   Default values includes all particles." << endl;
+			cout << " -S, --Sij=NUM      [-1.0]      Min threshold values for the Sij connection matrix." << endl;
 			cout << "                                Default value -1.0 to skip computation. A sparse matrix is written to node_connections.dat" << endl; 
 			cout << " -o, --output=FILE  [Q6.xyz]    Output file (*.xyz or *.xyz.gz)." << endl;
 			exit(0);
@@ -99,7 +104,6 @@ int main(int argc, char **argv) {
 			neighbour_cutoff = atof(optarg);
 			break;
 		case 'L':
-			
 			vecstr = split(optarg,',');
 			if( vecstr.size()==1 ) {
 				Lx = atof(optarg);
@@ -114,6 +118,14 @@ int main(int argc, char **argv) {
 				abort();
 			}
 			break;
+		case 'Q':
+			vecstr = split(optarg,',');
+			if( vecstr.size()==2 ) {
+				Qmin = atof(vecstr.at(0).c_str());
+				Qmax = atof(vecstr.at(1).c_str());
+			} else {
+				cerr << "error: unknown input for -Q, --QminQmax.\nTry -h or --help for more information." << endl;
+			}
 		case 'S':
 			Sij_min=atof(optarg);
 			break;
@@ -141,12 +153,16 @@ int main(int argc, char **argv) {
 		if(!quiet)
 			cout << "Wrote Sij matrix to node_connections.dat." << endl;
 	}
-	rot.write_xyz(ofilename);
+	/*if( Qmin<0.0 || Qmax<0.0 ){
+		Qmin=0.0;
+		Qmax=1e9;
+	}*/
+	rot.write_xyz(ofilename,Qmin,Qmax);
 
 	// Say goodby to the nice user (unless you are asked to be quiet). 
 	if(!quiet){
-		cout << rot.info() << endl << endl;
 		cout << "Wrote " << ofilename <<" with results." << endl;
+		cout << rot.info(Qmin,Qmax) << endl << endl;
 	}
 	
 	return 0;

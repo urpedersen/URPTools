@@ -81,10 +81,35 @@ void Cell_list::build(
 /**
 *  Return particle indexes of the 27 nearby images.
 */
-vector<unsigned> Cell_list::neighbors(unsigned index){
-	vector<unsigned> out;
-	// TODO look in 27 neighbors cells
-	return out;
+void Cell_list::neighbors(unsigned particle_index,vector<unsigned>& out){
+	out.clear();
+	unsigned index = index2cell.at(particle_index); // Convert particle index to a lattice index
+	
+	int ix=index%nx;
+	int iy=(index/nx)%ny;
+	int iz=index/(nx*ny);
+	//cout << " index = " << index << " ix = " <<  ix << " iy =  " << iy << " iz " << iz << endl; 
+	//cout << "   cells.size() = " << cells.size() << endl; 
+	//cout << "     nx = " << nx << " ny =  " << ny << " nz " << nz << endl; 
+	//cout << "       cells.at(index).size() = " << cells.at(index).size() << endl;
+		
+	for(int dix=-1;dix<2;dix++){
+		for(int diy=-1;diy<2;diy++){
+			for(int diz=-1;diz<2;diz++){
+				unsigned iix=(ix+dix+nx)%nx;
+				unsigned iiy=(iy+diy+ny)%ny;
+				unsigned iiz=(iz+diz+nz)%nz;
+				//cout << " (" << iix  << "," << iiy << "," << iiz << ") ";
+				unsigned nindex = iiz*ny*nx+iiy*nx+iix;
+				//cout << "nindex: " << nindex << endl;
+				for(unsigned i = 0; i < cells.at(nindex).size(); i++){
+					out.push_back( cells.at(nindex).at(i) );
+					//cout << cells.at(index).at(i) << " .. ";
+				}
+				//cout << endl;
+			}
+		}
+	}	
 }
 
 
@@ -101,14 +126,6 @@ string Cell_list::info(){
 	out << "nx*ny*nz = " << nx*ny*nz << endl;
 	out << "cells.size() = " << cells.size() << endl;
 	out << "cells.at(0).size() = " << cells.at(0).size() << endl;
-
-	for(unsigned iz=0;iz<nz;iz++) 
-		for(unsigned iy=0;iy<ny;iy++)
-			for(unsigned ix=0;ix<nx;ix++) {
-				unsigned index = iz*ny*nx+iy*nx+ix;
-				out << "Size at cell " << index << " : " << cells.at(index).size() << endl;
-	}
-				
 			
 	return out.str();
 } 
