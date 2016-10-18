@@ -46,6 +46,7 @@ public:
 	vector<Cluster_analysis_node*> nodes;
 
 	Cluster_analysis_cluster();	// Constructor
+	
 
 	void print();
 };
@@ -67,6 +68,8 @@ public:
 
 	void assign_nodes_to_clusters();
 	void create_cluster();
+	
+	void get_nodes_in_cluster(unsigned cluster_index, vector<unsigned>& out);
 
 	int get_mass_of_largest_cluster();
 	int get_index_of_largest_cluster();
@@ -233,6 +236,12 @@ void Cluster_analysis::assign_nodes_to_clusters(){
 void Cluster_analysis::create_cluster(){
 	clusters.push_back(new Cluster_analysis_cluster());
 	clusters.back()->index = clusters.size()-1;
+}
+
+void Cluster_analysis::get_nodes_in_cluster(unsigned c,vector<unsigned>& out){
+	out.clear();
+	for( unsigned i = 0 ; i<clusters[c]->nodes.size() ; i++ )
+		out.push_back(clusters[c]->nodes.at(i)->index);
 }
 
 /**

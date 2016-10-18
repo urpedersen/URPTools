@@ -23,7 +23,7 @@
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
 #include "Cell_list.h"
-
+#include "../../cluster_analysis/src/cluster_analysis.h"
 
 using namespace std;
 
@@ -185,7 +185,7 @@ void Rotational_order::compute_ql(unsigned in_degree){
 	}// Done looping particles
 }
 
-void Rotational_order::compute_Sij(double S_min,string filename){
+void Rotational_order::compute_Sij(double S_min,string filename,string filename_cluster){
 	
 	ofstream out;
 	out.open(filename.c_str());
@@ -243,6 +243,30 @@ void Rotational_order::compute_Sij(double S_min,string filename){
 		number_of_S_connections.push_back(num_connections);
 	}
 	out.close();
+
+	// Perform cluster analysis
+	Cluster_analysis clu;
+	clu.verbose=6;
+	clu.load_data_from_file(filename.c_str());
+	clu.assign_nodes_to_clusters();
+	//int clu_index = clu.get_index_of_largest_cluster();
+	//cout << " clu_index = " << clu_index << " mass = " <<  clu.get_mass_of_largest_cluster();
+	vector<unsigned> largest;
+	clu.get_nodes_in_cluster(clu.get_index_of_largest_cluster(),largest);
+	
+	ofstream out_cluster;
+	out_cluster.open(filename_cluster.c_str());
+	if(!out_cluster.is_open()){
+		cout << "error: could not open " << filename_cluster << " for writing coordinates of the largest cluster";
+		abort();
+	}
+	out_cluster << largest.size() << endl;
+	out_cluster << " Largest cluster of Sij connections " << endl;
+	for(unsigned i=0;i<largest.size();i++){
+		unsigned p = largest.at(i);
+		out_cluster << type.at(p) << " " << x.at(p) << " " << y.at(p) << " " << z.at(p) << endl;
+	}
+	out_cluster.close();
 }
 
 /**
@@ -344,6 +368,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 	
 	string line;
 	if(fileformat=="xyz"){ // READ xyz file 
+		if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 		// Begin to read header of selected frame
 		getline(in,line); // Number of atoms
 		unsigned num_atoms=atoi(line.c_str());
@@ -352,8 +377,10 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		// Skip frames
 		for(unsigned f=0;f<frame;f++){
 			for(unsigned i = 0;i<num_atoms;i++){
+				if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 				getline(in,line);
 			}
+			if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 			getline(in,line); // Number of atoms
 			num_atoms=atoi(line.c_str());
 			getline(in,line); // Comment line
@@ -363,9 +390,9 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		vector<string> sections = rotational_order_split(line,' ');
 		for(unsigned i = 0 ; i < sections.size() ; i++){
 			vector<string> elements = rotational_order_split(sections.at(i),'=');
-			if(elements.size()>0 && elements.at(0)=="sim_box" & elements.size()==2){
+			if(elements.size()>0 && elements.at(0)=="sim_box" && elements.size()==2){
 				vector<string> vars = rotational_order_split(elements.at(1),',');
-				if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" & vars.size()==4){
+				if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" && vars.size()==4){
 					Lx = atof(vars.at(1).c_str()); 
 					Ly = atof(vars.at(2).c_str()); 
 					Lz = atof(vars.at(3).c_str()); 
@@ -374,8 +401,8 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		}
 	
 		// Read atom positions in xyz file
-		unsigned line_counter=0;
 		for(unsigned i=0;i<num_atoms;i++){
+			if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 			getline(in,line);
 			char * pEnd;
 			int    i0;
@@ -391,14 +418,16 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		}
 	} else if( fileformat=="lammps" ) {
 	
-		int current_frame = -1;
+		unsigned current_frame = -1;
 		unsigned num_atoms=0;
 		bool not_done=true;
 		while(not_done){
+			if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 			getline(in,line);
 			vector<string> sections = rotational_order_split(line,' ');
-			if(sections.size()>3 && (sections.at(0)=="ITEM:" & sections.at(1)=="NUMBER" & sections.at(2)=="OF" & sections.at(3)=="ATOMS")){
+			if(sections.size()>3 && sections.at(0)=="ITEM:" && sections.at(1)=="NUMBER" && sections.at(2)=="OF" && sections.at(3)=="ATOMS"){
 				current_frame++;
+				if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 				getline(in,line);
 				num_atoms=atoi(line.c_str());
 				//cout << " num_atoms = " << num_atoms << " current_frame = " << current_frame << endl;
@@ -409,7 +438,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 					z.resize(num_atoms,0.0);
 				}
 			}
-			else if(sections.size()>2 && (sections.at(0)=="ITEM:" & sections.at(1)=="BOX" & sections.at(2)=="BOUNDS" )){
+			else if(sections.size()>2 && sections.at(0)=="ITEM:" && sections.at(1)=="BOX" && sections.at(2)=="BOUNDS" ){
 				getline(in,line);
 				vector<string> vars=rotational_order_split(line,' ');
 				if(vars.size()>1)
@@ -423,8 +452,10 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 				if(vars.size()>1)
 					Lz=atof(vars.at(1).c_str())-atof(vars.at(0).c_str());
 				//cout << " Lx = " << Lx << " Ly = " << Ly << " Lz = " << Lz << endl;
-			}else if(sections.size()>1 && (sections.at(0)=="ITEM:" & sections.at(1)=="ATOMS" & current_frame==frame)){
+			}else if(sections.size()>1 && sections.at(0)=="ITEM:" && sections.at(1)=="ATOMS" && current_frame==frame){
+				if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 				for(unsigned n=0;n<num_atoms;n++){
+					if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 					getline(in,line);
 					vector<string> vars=rotational_order_split(line,' ');
 					if(vars.size()>4){

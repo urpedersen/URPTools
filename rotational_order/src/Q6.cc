@@ -159,9 +159,9 @@ int main(int argc, char **argv) {
 	rot.load_xyz(ifilename,frame,Lx,Ly,Lz,neighbour_cutoff);
 	rot.compute_ql(degree);
 	if(Sij_min>-1.0) {
-		rot.compute_Sij(Sij_min,"node_connections.dat");
+		rot.compute_Sij(Sij_min,"node_connections.dat","largest_cluster.xyz");
 		if(!quiet)
-			cout << "Wrote Sij matrix to node_connections.dat." << endl;
+			cout << "Wrote Sij matrix to node_connections.dat and largest cluster of connected particles to largest_cluster.xyz." << endl;
 	}
 	/*if( Qmin<0.0 || Qmax<0.0 ){
 		Qmin=0.0;
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
 
 	// Say goodby to the nice user (unless you are asked to be quiet). 
 	if(!quiet){
-		cout << "Wrote " << ofilename <<" with results." << endl;
+		cout << "Wrote " << ofilename <<" with local bond-orderparamters of particles within Qmin and Qmax values." << endl;
 		cout << rot.info(Qmin,Qmax) << endl << endl;
 	}
 	

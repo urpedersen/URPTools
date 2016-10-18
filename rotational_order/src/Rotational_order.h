@@ -37,7 +37,7 @@ public:
 	void addParticle(unsigned in_type,double in_x,double in_y,double in_z);
 
 	void compute_ql(unsigned in_degree);
-	void compute_Sij(double S_min,string filename);
+	void compute_Sij(double S_min,string filename,string filename_cluster);
 
 	//void translate_all_particles(double dx,double dy,double dz);
 	//void load_xyz(ifstream& in);
