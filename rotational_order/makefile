@@ -8,5 +8,6 @@ gprof:
 	gprof ./bin/Q6_gprof gmon.out > gprof.txt
 
 clean: 
-	rm ./bin/Q6
+	rm -f Q6.xyz node_connections.dat largest_cluster.xyz  
+	rm -f ./bin/Q6
 	rmdir ./bin
