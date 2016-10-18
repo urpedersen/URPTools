@@ -261,7 +261,10 @@ void Rotational_order::compute_Sij(double S_min,string filename,string filename_
 		abort();
 	}
 	out_cluster << largest.size() << endl;
-	out_cluster << " Largest cluster of Sij connections " << endl;
+	out_cluster << " Largest cluster of Sij connections ";
+	out_cluster << " numTypes=" << number_of_types();
+	out_cluster << " sim_box=RectangularSimulationBox," << Lx << "," << Ly << "," << Lz;
+	out_cluster << " columns=type,x,y,z" << endl;
 	for(unsigned i=0;i<largest.size();i++){
 		unsigned p = largest.at(i);
 		out_cluster << type.at(p) << " " << x.at(p) << " " << y.at(p) << " " << z.at(p) << endl;

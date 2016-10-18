@@ -90,13 +90,21 @@ int main(int argc, char **argv) {
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
 			cout << " -i, --input=FILE   [input.xyz] Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
 			cout << " -f, --frame=INT    [0]         Frame of input file (0=first frame)." << endl;
-			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box (if not provided in input file)." << endl; 
-			cout << "     --Lenghts=NUM,NUM,NUM "  << endl;
+			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box," << endl;
+			cout << "     --Lenghts=NUM,NUM,NUM        unless it is provided in the input file." << endl; 
 			cout << " -Q  --QminQmax=NUM,NUM         Minimum and maximum Q6 limits" << endl;
-			cout << "                    [0.0,1.0]   Default values includes all particles." << endl;
+			cout << "                    [0.0,1.0]     Default values includes all particles." << endl;
 			cout << " -S, --Sij=NUM      [-1.0]      Min threshold values for the Sij connection matrix." << endl;
-			cout << "                                Default value -1.0 to skip computation. A sparse matrix is written to node_connections.dat" << endl; 
+			cout << "                                  Default value -1.0 skip computation." << endl;
+			cout << "                                  A sparse matrix is written to node_connections.dat and" << endl;
+			cout << "                                  the largest cluster is written to largest_cluster.xyz." << endl;
+			cout << "                                  The Lechner-Dellago vectors are for Sij." << endl; 
 			cout << " -o, --output=FILE  [Q6.xyz]    Output file (*.xyz or *.xyz.gz)." << endl;
+			cout << "                                  The 5th column gives number of neighbours. " << endl;
+			cout << "                                  The 6th column gives Steinhard bond-order. " << endl;
+			cout << "                                  The 7th column gives Lechner-Dellago bond-order. " << endl;
+			cout << "                                  The 8th column gives the number of Sij connections, " << endl;
+			cout << "                                  if the -S flag is applies. " << endl;
 			exit(0);
 			break;
 		case 'q':
