@@ -36,7 +36,6 @@ vector<string> rotational_order_split(string str, char delimiter) {
   return output;
 }
 
-
 /**
  * Constructor
  */
@@ -338,6 +337,23 @@ void Rotational_order::load_xyz(string ifilename,double in_Lx,double in_Ly,doubl
 	getline(in,line);
 	unsigned num_atoms=atoi(line.c_str());
 	getline(in,line); // Comment line
+	
+	// Attempt to find box vectors in header
+	// sim_box=RectangularSimulationBox
+	vector<string> sections = rotational_order_split(line,' ');
+	for(unsigned i = 0 ; i < sections.size() ; i++){
+		vector<string> elements = rotational_order_split(sections.at(i),'=');
+		if(elements.size()>0 && elements.at(0)=="sim_box" & elements.size()==2){
+			vector<string> vars = rotational_order_split(elements.at(1),',');
+			if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" & vars.size()==4){
+				Lx = atof(vars.at(1).c_str()); 
+				Ly = atof(vars.at(2).c_str()); 
+				Lz = atof(vars.at(3).c_str()); 
+			}
+		}
+	}
+	
+	// Read atom positions
 	unsigned line_counter=0;
 	for(unsigned i=0;i<num_atoms;i++){
 		getline(in,line);

@@ -1,5 +1,5 @@
 500
-FCC lattice, ./bin/q4q6 -L8,  ioformat=2 numTypes=1 sim_box=RectangularSimulationBox,8,8,8 mass=1 columns=type,x,y,z,imx,imy,imz,vx,vy,vz 
+FCC lattice ioformat=2 numTypes=1 sim_box=RectangularSimulationBox,8,8,8 mass=1 columns=type,x,y,z,imx,imy,imz,vx,vy,vz 
 0 -3.6 -3.6 -3.6 0 0 0 0.966773622188146 0.04878593843839413 -0.5640403072182276
 0 -2.8 -2.8 -3.6 0 0 0 1.481173469909082 -1.669308194270967 0.6550696513871987
 0 -2.8 -3.6 -2.8 0 0 0 1.212105325987611 1.743527355484444 1.478846561386645

@@ -1,5 +1,5 @@
 8000
-Liquid and crystal. Run with with q4q6 -L15.2274,15.2274,31.977
+Liquid and crystal at coexistence ioformat=2 numTypes=1 sim_box=RectangularSimulationBox,15.2274,15.2274,31.977 mass=1 columns=type,x,y,z
 1 0.0846575 15.1051 0.205621
 1 0.914088 0.556652 31.9627
 1 0.888056 15.1789 0.785834
