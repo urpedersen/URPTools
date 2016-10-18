@@ -1,11 +1,11 @@
 # rotational_order
 
 ## Q6
-      Compute the Q6 rotational bond order-parameters by Steinhard (ql),
-              and the Lechner-Dellago averaged versions (qlAvl).
- Local bond-orders parameters are printed to the last columns of an xyz-file.
+Compute the Q6 rotational bond order-parameters by Steinhard (ql),
+and the Lechner-Dellago averaged versions (qlAvl).
+Local bond-orders parameters are printed to the last columns of an xyz-file.
 
-              Written by Ulf R. Pedersen (2016), www.urp.dk.
+Written by Ulf R. Pedersen (2016), www.urp.dk.
 
 ### Build
 This program uses the boost c++ library. Get it on Debian or Ubuntu with:
