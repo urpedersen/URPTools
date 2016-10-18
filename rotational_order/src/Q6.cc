@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
 	bool quiet=false;
 	unsigned degree = 6;
 	string ifilename = "input.xyz";
+	unsigned frame=0;
 	double Lx=10,Ly=10,Lz=10;
 	double neighbour_cutoff=1.4;
 	string ofilename = "Q6.xyz";
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
 				{"quiet",	no_argument, 0, 'q'},
 				{"degree",	optional_argument, 0, 'l'},
 				{"input",	optional_argument, 0, 'i'},
+				{"frame",	optional_argument, 0, 'f'},
 				{"Lengths",	optional_argument, 0, 'L'},
 				{"rcut",	optional_argument, 0, 'r'},
 				{"QminQmax",	optional_argument, 0, 'Q'},
@@ -63,7 +65,7 @@ int main(int argc, char **argv) {
 				{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		c = getopt_long (argc, argv, "hql:i:L:r:Q:S:o:",long_options,&option_index);
+		c = getopt_long (argc, argv, "hql:i:f:L:r:Q:S:o:",long_options,&option_index);
 		if(c==-1) break;
 		switch (c) {
 		/*case 0:
@@ -73,10 +75,10 @@ int main(int argc, char **argv) {
 			printf ("\n");
 			break;*/
 		case 'h':
-			//cout << endl;
-			cout << "    Compute the Q6 rotational bond order-parameters by Steinhard (ql)," << endl;
-			cout << "            and the Lechner-Dellago averaged versions (qlAvl)." << endl;
-			cout << "     Local bond orders are printed to the last columns of an xyz-file." << endl << endl;
+			cout << endl;
+			cout << "      Compute the Q6 rotational bond order-parameters by Steinhard (ql)," << endl;
+			cout << "              and the Lechner-Dellago averaged versions (qlAvl)." << endl;
+			cout << " Local bond-orders parameters are printed to the last columns of an xyz-file." << endl << endl;
 			cout << "              Written by Ulf R. Pedersen (2016), www.urp.dk." << endl << endl;
 			cout << "Usage examples:" << endl;
 			cout << argv[0] << " --input=input.xyz --Lenghts=15.0,15.0.30.0" << endl;
@@ -87,7 +89,8 @@ int main(int argc, char **argv) {
 			cout << " -l, --l=INT        [6]         The degree of the bond rotational-order." << endl;
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
 			cout << " -i, --input=FILE   [input.xyz] Input file (*.xyz or *.xyz.gz)." << endl;
-			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box." << endl; 
+			cout << " -f, --frame=INT    [0]         Frame of input file (0=first frame)." << endl;
+			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box (if not provided in input file)." << endl; 
 			cout << "     --Lenghts=NUM,NUM,NUM "  << endl;
 			cout << " -Q  --QminQmax=NUM,NUM         Minimum and maximum Q6 limits" << endl;
 			cout << "                    [0.0,1.0]   Default values includes all particles." << endl;
@@ -99,13 +102,16 @@ int main(int argc, char **argv) {
 		case 'q':
 			quiet=true;
 			break;
-		case 'i':
-			ifilename = optarg;
-			break;
 		case 'l':
 			degree = atoi(optarg);
 		case 'r':
 			neighbour_cutoff = atof(optarg);
+			break;
+		case 'i':
+			ifilename = optarg;
+			break;
+		case 'f':
+			frame = atoi(optarg);
 			break;
 		case 'L':
 			vecstr = split(optarg,',');
@@ -150,7 +156,7 @@ int main(int argc, char **argv) {
 
 	// Create object to compute rotational order
 	Rotational_order rot;
-	rot.load_xyz(ifilename,Lx,Ly,Lz,neighbour_cutoff);
+	rot.load_xyz(ifilename,frame,Lx,Ly,Lz,neighbour_cutoff);
 	rot.compute_ql(degree);
 	if(Sij_min>-1.0) {
 		rot.compute_Sij(Sij_min,"node_connections.dat");

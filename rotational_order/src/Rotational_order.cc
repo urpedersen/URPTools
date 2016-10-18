@@ -308,7 +308,7 @@ void Rotational_order::load_xyz(ifstream& ifile){
 /**
 * Load coordinates of particles from xyz-file or an zipped xyz.gz file.
 */
-void Rotational_order::load_xyz(string ifilename,double in_Lx,double in_Ly,double in_Lz,double in_neighbour_cutoff){
+void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,double in_Ly,double in_Lz,double in_neighbour_cutoff){
 	using namespace boost::iostreams;
 	
 	Lx=in_Lx;
@@ -332,63 +332,58 @@ void Rotational_order::load_xyz(string ifilename,double in_Lx,double in_Ly,doubl
 		cerr << "error: Incompatible name of output file. Should be an *.xyz or *.xyz.gz file." << endl;
 		abort();
 	}
+
 	
-	string line;
-	getline(in,line);
-	unsigned num_atoms=atoi(line.c_str());
-	getline(in,line); // Comment line
-	
-	// Attempt to find box vectors in header
-	// sim_box=RectangularSimulationBox
-	vector<string> sections = rotational_order_split(line,' ');
-	for(unsigned i = 0 ; i < sections.size() ; i++){
-		vector<string> elements = rotational_order_split(sections.at(i),'=');
-		if(elements.size()>0 && elements.at(0)=="sim_box" & elements.size()==2){
-			vector<string> vars = rotational_order_split(elements.at(1),',');
-			if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" & vars.size()==4){
-				Lx = atof(vars.at(1).c_str()); 
-				Ly = atof(vars.at(2).c_str()); 
-				Lz = atof(vars.at(3).c_str()); 
+	{ // READ xyz file 
+		string line;
+		
+		// Begin to read header of selected frame
+		getline(in,line); // Number of atoms
+		unsigned num_atoms=atoi(line.c_str());
+		getline(in,line); // Comment line
+		
+		// Skip frames
+		for(unsigned f=0;f<frame;f++){
+			for(unsigned i = 0;i<num_atoms;i++){
+				getline(in,line);
+			}
+			getline(in,line); // Number of atoms
+			num_atoms=atoi(line.c_str());
+			getline(in,line); // Comment line
+		}
+		
+		// Attempt to find box vectors in header
+		vector<string> sections = rotational_order_split(line,' ');
+		for(unsigned i = 0 ; i < sections.size() ; i++){
+			vector<string> elements = rotational_order_split(sections.at(i),'=');
+			if(elements.size()>0 && elements.at(0)=="sim_box" & elements.size()==2){
+				vector<string> vars = rotational_order_split(elements.at(1),',');
+				if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" & vars.size()==4){
+					Lx = atof(vars.at(1).c_str()); 
+					Ly = atof(vars.at(2).c_str()); 
+					Lz = atof(vars.at(3).c_str()); 
+				}
 			}
 		}
-	}
-	
-	// Read atom positions
-	unsigned line_counter=0;
-	for(unsigned i=0;i<num_atoms;i++){
-		getline(in,line);
-		char * pEnd;
-		int    i0;
-		double d0, d1, d2;
-		i0 = strtol (line.c_str(),&pEnd,10);
-		d0 = strtod (pEnd,&pEnd);
-		d1 = strtod (pEnd,&pEnd);
-		d2 = strtod (pEnd,&pEnd);
-		type.push_back(i0);
-		x.push_back(d0);
-		y.push_back(d1);
-		z.push_back(d2);
-	}
 	
 	
-	//cout << line;
-	
-	//abort();
-	/*
-	//filtering_istream in;
-	//in.push(file_sink(ifilename));
-	
-	ifstream ifile;
-	ifile.open(ifilename.c_str());
-	filtering_streambuf<input> in;
-	
-	
-	if(ifile.is_open()){
-		load_xyz(ifile);
-	}else{
-		cerr << "error: Could not load input file name " << ifilename << endl;
-		abort();
-	}*/
+		// Read atom positions in xyz file
+		unsigned line_counter=0;
+		for(unsigned i=0;i<num_atoms;i++){
+			getline(in,line);
+			char * pEnd;
+			int    i0;
+			double d0, d1, d2;
+			i0 = strtol (line.c_str(),&pEnd,10);
+			d0 = strtod (pEnd,&pEnd);
+			d1 = strtod (pEnd,&pEnd);
+			d2 = strtod (pEnd,&pEnd);
+			type.push_back(i0);
+			x.push_back(d0);
+			y.push_back(d1);
+			z.push_back(d2);
+		}
+	} // END of reading xyz-file
 }
 
 
