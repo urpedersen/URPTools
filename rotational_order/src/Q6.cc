@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 			cout << " -q, --quiet                    Hide program output." << endl;
 			cout << " -l, --l=INT        [6]         The degree of the bond rotational-order." << endl;
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
-			cout << " -i, --input=FILE   [input.xyz] Input file (*.xyz or *.xyz.gz)." << endl;
+			cout << " -i, --input=FILE   [input.xyz] Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
 			cout << " -f, --frame=INT    [0]         Frame of input file (0=first frame)." << endl;
 			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box (if not provided in input file)." << endl; 
 			cout << "     --Lenghts=NUM,NUM,NUM "  << endl;

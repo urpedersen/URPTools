@@ -125,8 +125,12 @@ string Cell_list::info(){
 	out << "nz = " << nz << endl;
 	out << "nx*ny*nz = " << nx*ny*nz << endl;
 	out << "cells.size() = " << cells.size() << endl;
-	out << "cells.at(0).size() = " << cells.at(0).size() << endl;
-			
+	//out << "cells.at(0).size() = " << cells.at(0).size() << endl;
+	
+	for(unsigned i = 0;i<cells.size();i++)
+		out << "cells.at( " << i << " ).size() = " << cells.at(i).size() << endl;
+	
+
 	return out.str();
 } 
 

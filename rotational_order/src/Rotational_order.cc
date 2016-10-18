@@ -306,11 +306,13 @@ void Rotational_order::load_xyz(ifstream& ifile){
 
 
 /**
-* Load coordinates of particles from xyz-file or an zipped xyz.gz file.
+* Load coordinates of particles from xyz-file or an zipped xyz.gz file or a LAMMPS *.atom file
 */
 void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,double in_Ly,double in_Lz,double in_neighbour_cutoff){
 	using namespace boost::iostreams;
 	
+	string fileformat="";
+
 	Lx=in_Lx;
 	Ly=in_Ly;
 	Lz=in_Lz;
@@ -323,20 +325,25 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		cerr << "error: Incompatible name of input file. Should be an *.xyz or *.xyz.gz file." << endl;
 		abort();
 	}
-	if(fnames.back()=="xyz"){
+	if(fnames.back()=="atom"){
 		in.push(file_source(ifilename));
-	} else if ( fnames.back()=="gz" && fnames.at(fnames.size()-2)=="xyz" ) {
+		fileformat="lammps";
+	}
+	else if(fnames.back()=="xyz"){
+		in.push(file_source(ifilename));
+		fileformat="xyz";
+	} else if ( fnames.back()=="gz" && (fnames.at(fnames.size()-2)=="xyz" ) ) {
 		in.push(gzip_decompressor());
 		in.push(file_source(ifilename));
+		fileformat="xyz";
 	} else {
-		cerr << "error: Incompatible name of output file. Should be an *.xyz or *.xyz.gz file." << endl;
+		cerr << "error: Incompatible name of output file. Should be an *.xyz, *.xyz.gz or *.atom file." << endl;
 		abort();
 	}
 
 	
-	{ // READ xyz file 
-		string line;
-		
+	string line;
+	if(fileformat=="xyz"){ // READ xyz file 
 		// Begin to read header of selected frame
 		getline(in,line); // Number of atoms
 		unsigned num_atoms=atoi(line.c_str());
@@ -366,7 +373,6 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 			}
 		}
 	
-	
 		// Read atom positions in xyz file
 		unsigned line_counter=0;
 		for(unsigned i=0;i<num_atoms;i++){
@@ -383,7 +389,61 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 			y.push_back(d1);
 			z.push_back(d2);
 		}
-	} // END of reading xyz-file
+	} else if( fileformat=="lammps" ) {
+	
+		int current_frame = -1;
+		unsigned num_atoms=0;
+		bool not_done=true;
+		while(not_done){
+			getline(in,line);
+			vector<string> sections = rotational_order_split(line,' ');
+			if(sections.size()>3 && (sections.at(0)=="ITEM:" & sections.at(1)=="NUMBER" & sections.at(2)=="OF" & sections.at(3)=="ATOMS")){
+				current_frame++;
+				getline(in,line);
+				num_atoms=atoi(line.c_str());
+				//cout << " num_atoms = " << num_atoms << " current_frame = " << current_frame << endl;
+				if(frame==current_frame){
+					type.resize(num_atoms,0);
+					x.resize(num_atoms,0.0);
+					y.resize(num_atoms,0.0);
+					z.resize(num_atoms,0.0);
+				}
+			}
+			else if(sections.size()>2 && (sections.at(0)=="ITEM:" & sections.at(1)=="BOX" & sections.at(2)=="BOUNDS" )){
+				getline(in,line);
+				vector<string> vars=rotational_order_split(line,' ');
+				if(vars.size()>1)
+					Lx=atof(vars.at(1).c_str())-atof(vars.at(0).c_str());
+				getline(in,line);
+				vars=rotational_order_split(line,' ');
+				if(vars.size()>1)
+					Ly=atof(vars.at(1).c_str())-atof(vars.at(0).c_str());
+				getline(in,line);
+				vars=rotational_order_split(line,' ');
+				if(vars.size()>1)
+					Lz=atof(vars.at(1).c_str())-atof(vars.at(0).c_str());
+				//cout << " Lx = " << Lx << " Ly = " << Ly << " Lz = " << Lz << endl;
+			}else if(sections.size()>1 && (sections.at(0)=="ITEM:" & sections.at(1)=="ATOMS" & current_frame==frame)){
+				for(unsigned n=0;n<num_atoms;n++){
+					getline(in,line);
+					vector<string> vars=rotational_order_split(line,' ');
+					if(vars.size()>4){
+						unsigned i = atoi(vars.at(0).c_str())-1;
+						//cout << i << endl;
+						type.at(i) = atoi(vars.at(1).c_str());
+						x.at(i)    = atof(vars.at(2).c_str())*Lx;
+						y.at(i)    = atof(vars.at(3).c_str())*Ly;
+						z.at(i)    = atof(vars.at(4).c_str())*Lz;
+						//cout << i << " " <<  type.at(i) << " " << x.at(i) << " " << y.at(i) << " " << z.at(i) << endl;
+					}
+				}
+				not_done=false;
+			}
+		}
+	} else {
+		cerr << "error: Unknown input file format. filename = " <<  ifilename;
+	}
+	//cout << "Done reading " << ifilename << " Lx = " << Lx << " Ly = " << Ly << " Lz = " << Lz <<  " num_atoms = " << x.size() << endl;
 }
 
 
