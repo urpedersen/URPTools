@@ -16,11 +16,15 @@ Then type
 ```
 make
 ```
-to build. The executable program named Q6 is located in
+to build. The executable program is
 ```
-./bin/
+./bin/Q6
 ```
-
+Type
+```
+./bin/Q6 -h
+```
+for more infomation.
 ### Usage:
 ```
 Usage examples:
