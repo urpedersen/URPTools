@@ -306,6 +306,7 @@ double Rotational_order::volume(){
 	return Lx*Ly*Lz;
 }
 
+
 /*
 void Rotational_order::load_xyz(ifstream& ifile){
 		string line;
@@ -329,7 +330,8 @@ void Rotational_order::load_xyz(ifstream& ifile){
 		}
 	
 	
-}*/
+}
+*/
 
 
 /**

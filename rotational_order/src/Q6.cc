@@ -35,11 +35,11 @@ int main(int argc, char **argv) {
 	// Set default values
 	bool quiet=false;
 	unsigned degree = 6;
-	string ifilename = "input.xyz";
+	string ifilename = "traj.xyz";
 	unsigned frame=0;
 	double Lx=10,Ly=10,Lz=10;
 	double neighbour_cutoff=1.4;
-	string ofilename = "Q6.xyz";
+	string ofilename = "none";
 	double Qmin=0.0;
 	double Qmax=1.0;
 	double Sij_min=-1.0;
@@ -96,12 +96,13 @@ int main(int argc, char **argv) {
 			cout << "                                  A sparse matrix is written to node_connections.dat and" << endl;
 			cout << "                                  the largest cluster is written to largest_cluster.xyz." << endl;
 			cout << "                                  The Lechner-Dellago vectors are for Sij." << endl; 
-			cout << " -o, --output=FILE  [Q6.xyz]    Output file (*.xyz or *.xyz.gz)." << endl;
+			cout << " -o, --output=FILE  [none]      Output file (*.xyz or *.xyz.gz)." << endl;
+			cout << "                                  Default value none does not produce a file." << endl;
 			cout << "                                  The 5th column gives number of neighbours. " << endl;
 			cout << "                                  The 6th column gives Steinhard bond-order. " << endl;
 			cout << "                                  The 7th column gives Lechner-Dellago bond-order. " << endl;
 			cout << "                                  The 8th column gives the number of Sij connections, " << endl;
-			cout << "                                  if the -S flag is applies. " << endl;
+			cout << "                                  if the -S flag is used. " << endl;
 			exit(0);
 			break;
 		case 'q':
@@ -168,15 +169,13 @@ int main(int argc, char **argv) {
 		if(!quiet)
 			cout << "Wrote Sij matrix to node_connections.dat and largest cluster of connected particles to largest_cluster.xyz." << endl;
 	}
-	/*if( Qmin<0.0 || Qmax<0.0 ){
-		Qmin=0.0;
-		Qmax=1e9;
-	}*/
-	rot.write_xyz(ofilename,Qmin,Qmax);
+	if(ofilename!="none"){
+		rot.write_xyz(ofilename,Qmin,Qmax);
+		cout << "Wrote " << ofilename <<" with local bond-orderparamters of particles within Qmin and Qmax values." << endl;
+	}
 
 	// Say goodby to the nice user (unless you are asked to be quiet). 
 	if(!quiet){
-		cout << "Wrote " << ofilename <<" with local bond-orderparamters of particles within Qmin and Qmax values." << endl;
 		cout << rot.info(Qmin,Qmax) << endl << endl;
 	}
 	
