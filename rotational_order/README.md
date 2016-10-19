@@ -1,7 +1,5 @@
 # rotational_order
 
-NOTE THAT THIS PROGRAM IS IN A TESTING STATE
-
 ## Q6
 Compute the Q6 rotational bond order-parameters by Steinhard (ql),
 and the Lechner-Dellago averaged versions (qlAvl).
@@ -61,20 +59,22 @@ Optional flags:     [default]
 * W. Lechner and C. Dellago, J. Chem. Phys. 129, 114707 (2008), http://dx.doi.org/10.1063/1.2977970
 
 ## Table of local orderparameters of perfect structures
-For reference, the table below list local bond order parameters for common crystal structures.
+For reference, the table below list local bond-order parameters using a cut-off including N neighbours:
 
-|      | bcc   |
-| N    | 8     |
-|------|-------|
-| l=2  | 0     |
-| l=3  | 0     |
-| l=4  | 0.509 |
-| l=5  | 0     |
-| l=6  | 0     |
-| l=8  | 0     |
-| l=9  | 0     |
-| l=10 | 0     |
-| l=11 | 0     |
-| l=12 | 0     |
+|         | bcc   | bcc   | fcc   | hcp   | Icosahedral | sc    |
+| ------- |:-----:|:-----:|:-----:|:-----:|:-----------:|------:|
+| N       | 8     | 14    | 12    | 12    | 12          | 6     |
+| l=2     | 0     | 0     | 0     | 0     | 0           | 0     |
+| l=3     | 0     | 0     | 0     | 0.076 | 0           | 0     |
+| l=4     | 0.509 | 0.036 | 0.190 | 0.097 | 0           | 0.764 |
+| l=5     | 0     | 0     | 0     | 0.252 | 0           | 0     |
+| l=6     | 0.629 | 0.511 | 0.575 | 0.484 | 0.663       | 0.354 |
+| l=7     | 0     | 0     | 0     | 0.311 | 0           | 0     |
+| l=8     | 0.213 | 0.429 | 0.404 | 0.317 | 0           | 0.718 |
+| l=9     | 0     | 0     | 0     | 0.138 | 0           | 0     |
+| l=10    | 0.650 | 0.195 | 0.013 | 0.010 | 0.363       | 0.411 |
+| l=11    | 0     | 0     | 0     | 0.123 | 0           | 0     |
+| l=12    | 0.415 | 0.405 | 0.600 | 0.565 | 0.585       | 0.696 |
 
+* J. Chem. Phys. 138, 044501 (2013); http://dx.doi.org/10.1063/1.4774084
 
