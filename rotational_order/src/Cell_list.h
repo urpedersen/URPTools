@@ -26,9 +26,9 @@ public:
 	virtual ~Cell_list();
 	
 	void build(
-		vector<double> x,
-		vector<double> y,
-		vector<double> z,
+		const vector<double>& x,
+		const vector<double>& y,
+		const vector<double>& z,
 		double X,
 		double Y,
 		double Z,

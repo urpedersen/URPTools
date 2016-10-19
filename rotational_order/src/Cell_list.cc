@@ -43,9 +43,9 @@ Cell_list::~Cell_list() {
 *  r gives a minimum lengths of the cell
 */
 void Cell_list::build(
-	vector<double> x,
-	vector<double> y,
-	vector<double> z,
+	const vector<double>& x,
+	const vector<double>& y,
+	const vector<double>& z,
 	double X,
 	double Y,
 	double Z,
@@ -102,11 +102,10 @@ void Cell_list::neighbors(unsigned particle_index,vector<unsigned>& out){
 				//cout << " (" << iix  << "," << iiy << "," << iiz << ") ";
 				unsigned nindex = iiz*ny*nx+iiy*nx+iix;
 				//cout << "nindex: " << nindex << endl;
-				for(unsigned i = 0; i < cells.at(nindex).size(); i++){
+				out.insert(out.end(),cells.at(nindex).begin(),cells.at(nindex).end() );
+				/*for(unsigned i = 0; i < cells.at(nindex).size(); i++){
 					out.push_back( cells.at(nindex).at(i) );
-					//cout << cells.at(index).at(i) << " .. ";
-				}
-				//cout << endl;
+				}*/
 			}
 		}
 	}	
