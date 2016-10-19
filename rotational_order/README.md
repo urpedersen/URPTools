@@ -59,16 +59,17 @@ Optional flags:     [default]
 * W. Lechner and C. Dellago, J. Chem. Phys. 129, 114707 (2008), http://dx.doi.org/10.1063/1.2977970
 
 ## Table of local orderparameters of perfect structures
-For reference, the table below list local bond-order parameters using a cut-off including N neighbours:
+For reference, the table below list local bond-order parameters using a cut-off including N neighbours.
+The last two coulmns contains the values of the Lennard-Jones liquid at the coexistence state-point at T = 2 (see J. Chem. Phys. 139, 104102 (2013); http://dx.doi.org/10.1063/1.4818747 for details on this state-point). (ste) referer to the Steinhard definition, while (lec) is the Lechner-Dellago averaged version.
 
-|         | bcc   | bcc   | fcc   | hcp   | Icosahedral | sc    |
-| ------- |:-----:|:-----:|:-----:|:-----:|:-----------:|------:|
-| N       | 8     | 14    | 12    | 12    | 12          | 6     |
-| l=2     | 0     | 0     | 0     | 0     | 0           | 0     |
-| l=3     | 0     | 0     | 0     | 0.076 | 0           | 0     |
-| l=4     | 0.509 | 0.036 | 0.190 | 0.097 | 0           | 0.764 |
-| l=5     | 0     | 0     | 0     | 0.252 | 0           | 0     |
-| l=6     | 0.629 | 0.511 | 0.575 | 0.484 | 0.663       | 0.354 |
+|         | bcc   | bcc   | fcc   | hcp   | Icosahedral | sc    | liq(ste) | liq(lec) |
+| ------- |:-----:|:-----:|:-----:|:-----:|:-----------:|:-----:|:--------:|---------:|
+| N       | 8     | 14    | 12    | 12    | 12          | 6     | 
+| l=2     | 0     | 0     | 0     | 0     | 0           | 0     | 
+| l=3     | 0     | 0     | 0     | 0.076 | 0           | 0     | 
+| l=4     | 0.509 | 0.036 | 0.190 | 0.097 | 0           | 0.764 | 
+| l=5     | 0     | 0     | 0     | 0.252 | 0           | 0     | 
+| l=6     | 0.629 | 0.511 | 0.575 | 0.484 | 0.663       | 0.354 | 0.376    | 0.155    |
 | l=7     | 0     | 0     | 0     | 0.311 | 0           | 0     |
 | l=8     | 0.213 | 0.429 | 0.404 | 0.317 | 0           | 0.718 |
 | l=9     | 0     | 0     | 0     | 0.138 | 0           | 0     |
@@ -76,5 +77,5 @@ For reference, the table below list local bond-order parameters using a cut-off 
 | l=11    | 0     | 0     | 0     | 0.123 | 0           | 0     |
 | l=12    | 0.415 | 0.405 | 0.600 | 0.565 | 0.585       | 0.696 |
 
-* J. Chem. Phys. 138, 044501 (2013); http://dx.doi.org/10.1063/1.4774084
+A part this table is from: J. Chem. Phys. 138, 044501 (2013); http://dx.doi.org/10.1063/1.4774084
 
