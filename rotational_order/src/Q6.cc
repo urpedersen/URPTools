@@ -76,7 +76,8 @@ int main(int argc, char **argv) {
 			cout << "      Compute the Q6 rotational bond order-parameters by Steinhard (ql)," << endl;
 			cout << "              and the Lechner-Dellago averaged versions (qlAvl)." << endl;
 			cout << " Local bond-orders parameters are printed to the last columns of an xyz-file." << endl << endl;
-			cout << "              Written by Ulf R. Pedersen (2016), www.urp.dk." << endl << endl;
+			cout << "              Written by Ulf R. Pedersen (2016), www.urp.dk." << endl;
+			cout << "        This program is a part of github.com/urpedersen/URPTools" << endl << endl;
 			cout << "Usage examples:" << endl;
 			cout << argv[0] << " --input=input.xyz --Lenghts=15.0,15.0.30.0" << endl;
 			cout << argv[0] << " -i bcc.xyz -L 15.0 -r 1.5 -l 4 -o Q4.xyz" << endl << endl;
@@ -85,19 +86,19 @@ int main(int argc, char **argv) {
 			cout << " -q, --quiet                    Hide program output." << endl;
 			cout << " -l, --degree=INT   [6]         The degree of the bond rotational-order." << endl;
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
-			cout << " -i, --input=FILE   [input.xyz] Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
+			cout << " -i, --input=FILE   [traj.xyz]  Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
 			cout << " -f, --frame=INT    [0]         Frame of input file (0=first frame)." << endl;
 			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box," << endl;
 			cout << "     --Lenghts=NUM,NUM,NUM        unless it is provided in the input file." << endl; 
 			cout << " -Q  --QminQmax=NUM,NUM         Minimum and maximum q6 limits" << endl;
 			cout << "                    [0.0,1.0]     Default values includes all particles." << endl;
 			cout << " -S, --Sij=NUM      [-1.0]      Min threshold values for the Sij connection matrix." << endl;
-			cout << "                                  Default value -1.0 skip computation." << endl;
+			cout << "                                  The default value of -1.0 skips computation." << endl;
 			cout << "                                  A sparse matrix is written to node_connections.dat and" << endl;
 			cout << "                                  the largest cluster is written to largest_cluster.xyz." << endl;
 			cout << "                                  The Lechner-Dellago vectors are used to compute Sij." << endl; 
 			cout << " -o, --output=FILE  [none]      Output file (*.xyz or *.xyz.gz)." << endl;
-			cout << "                                  Default value none does not produce a file." << endl;
+			cout << "                                  Default value does not produce an output file." << endl;
 			cout << "                                  The 5th column gives number of neighbours. " << endl;
 			cout << "                                  The 6th column gives Steinhard bond-order. " << endl;
 			cout << "                                  The 7th column gives Lechner-Dellago bond-order. " << endl;
@@ -110,6 +111,7 @@ int main(int argc, char **argv) {
 			break;
 		case 'l':
 			degree = atoi(optarg);
+			break;
 		case 'r':
 			neighbour_cutoff = atof(optarg);
 			break;
