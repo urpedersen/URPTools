@@ -24,14 +24,11 @@ using namespace std;
  * Split a string into a vector string
  */
 
-#ifndef HELPER_FUNCTION_SPLIT
-#define HELPER_FUNCTION_SPLIT
 vector<string> split(string str, char delimiter) {
   vector<string> output;stringstream ss(str);string substr;
   while(getline(ss, substr, delimiter)) output.push_back(substr);
   return output;
 }
-#endif // END HELPER_FUNCTION_SPLIT
 
 int main(int argc, char **argv) {
 
