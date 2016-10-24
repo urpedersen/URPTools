@@ -143,6 +143,7 @@ int main(int argc, char **argv) {
 				Qmax = atof(vecstr.at(1).c_str());
 			} else {
 				cerr << "error: unknown input for -Q, --QminQmax.\nTry -h or --help for more information." << endl;
+				abort();
 			}
 			break;
 		case 'S':
