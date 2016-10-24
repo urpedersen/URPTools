@@ -144,6 +144,7 @@ int main(int argc, char **argv) {
 			} else {
 				cerr << "error: unknown input for -Q, --QminQmax.\nTry -h or --help for more information." << endl;
 			}
+			break;
 		case 'S':
 			Sij_min=atof(optarg);
 			break;
