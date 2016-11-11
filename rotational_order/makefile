@@ -1,6 +1,6 @@
-all: src/Q6.cc
+all: 
 	mkdir -p bin
-	g++ -O3 -Wall ./src/Cell_list.h ./src/Cell_list.cc ./src/Rotational_order.h ./src/Rotational_order.cc ./src/Q6.cc -lboost_iostreams -o ./bin/Q6
+	g++ -O3 -Wall ./src/Cell_list.h ./src/Cell_list.cc ./src/split.h ./src/split.cc ./src/Rotational_order.h ./src/Rotational_order.cc ./src/Q6.cc -lboost_iostreams -o ./bin/Q6
 
 test:
 	time ./bin/Q6 -i examples/liq_fcc.xyz -Q0.3,1.0

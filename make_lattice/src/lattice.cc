@@ -16,16 +16,14 @@
 #include <cmath>
 #include <iomanip>
 
+#include <boost/iostreams/filtering_stream.hpp>   // Linker -lboost_iostreams
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/device/file.hpp>
+
+#include "split.h"
+
 using namespace std;
 
-/**
- * Return random component to velocity vector TODO See if this is the right distribution
- */
-double random_velocity(double temperature,double mass){
-	double tmp = 0.0;
-	for(unsigned i=0;i<12;i++) tmp+=((double)rand()/(double)RAND_MAX-0.5); // Normal distribution with sigma=1
-	return tmp*sqrt(temperature/mass);
-}
 
 /**
  *
@@ -45,6 +43,25 @@ Lattice::Lattice(string in_lattice_type,unsigned nx, unsigned ny,unsigned nz,uns
 		mass_of_types()
 	{
 	srand(seed);
+	
+	// Attempt to load a file if *.xyz or *.xyz.gz is given as lattice type
+	vector<string> fnames = split(in_lattice_type,'.');
+	if (fnames.size()>1) {
+		using namespace boost::iostreams;
+		filtering_istream in;
+		if(fnames.back()=="xyz"){
+			in.push(file_source(in_lattice_type));
+		} else if ( fnames.back()=="gz" && (fnames.at(fnames.size()-2)=="xyz" ) ) {
+			in.push(gzip_decompressor());
+			in.push(file_source(in_lattice_type));
+		} else {
+			cerr << "error: Unknown name of input file for lattice. Should be an *.xyz, *.xyz.gz or file." << endl;
+			abort();
+		}
+		// TODO read the lattice file
+	}
+	
+	// Use identifyer of build-in lattice types
 	if(lattice_type=="sc"){			// Simple cubic
 		for(unsigned ix=0;ix<nx;ix++){
 			for(unsigned iy=0;iy<ny;iy++){
@@ -227,6 +244,15 @@ Lattice::~Lattice() {
 	x.clear();
 	y.clear();
 	z.clear();
+}
+
+/**
+ * Return random component to velocity vector TODO See if this is the right distribution
+ */
+double Lattice::random_velocity(double temperature,double mass){
+	double tmp = 0.0;
+	for(unsigned i=0;i<12;i++) tmp+=((double)rand()/(double)RAND_MAX-0.5); // Normal distribution with sigma=1
+	return tmp*sqrt(temperature/mass);
 }
 
 /**

@@ -19,19 +19,9 @@
 #include <boost/iostreams/device/file.hpp>
 
 #include "lattice.h"
+#include "split.h"
 
 using namespace std;
-
-
-/**
- * Split a string into a vector string
- */
-vector<string> split(string str, char delimiter) {
-  vector<string> output;stringstream ss(str);string substr;
-  while(getline(ss, substr, delimiter)) output.push_back(substr);
-  return output;
-}
-
 
 int main(int argc, char **argv) {
 

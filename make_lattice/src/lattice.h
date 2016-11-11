@@ -24,6 +24,8 @@ private:
 	double Lz;
 	vector<double> mass_of_types;
 
+	double random_velocity(double temperature,double mass);
+
 public:
 	Lattice(string lattice_type,unsigned nx,unsigned ny,unsigned nz,unsigned seed);
 	virtual ~Lattice();

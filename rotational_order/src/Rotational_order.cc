@@ -22,6 +22,7 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
+#include "split.h"
 #include "Cell_list.h"
 #include "../../cluster_analysis/src/cluster_analysis.h"
 
@@ -29,12 +30,12 @@ using namespace std;
 
 /**
  * Split a string into a vector string
- */
 vector<string> rotational_order_split(string str, char delimiter) {
   vector<string> output;stringstream ss(str);string substr;
   while(getline(ss, substr, delimiter)) output.push_back(substr);
   return output;
 }
+ */
 
 /**
  * Constructor
@@ -348,7 +349,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 	neighbour_cutoff=in_neighbour_cutoff;
 
 	filtering_istream in;
-	vector<string> fnames = rotational_order_split(ifilename,'.');
+	vector<string> fnames = split(ifilename,'.');
 	//in.push(file_source(ifilename));
 	if(fnames.size()<2){
 		cerr << "error: Incompatible name of input file. Should be an *.xyz or *.xyz.gz file." << endl;
@@ -366,7 +367,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		in.push(file_source(ifilename));
 		fileformat="xyz";
 	} else {
-		cerr << "error: Incompatible name of output file. Should be an *.xyz, *.xyz.gz or *.atom file." << endl;
+		cerr << "error: Incompatible name of input file. Should be an *.xyz, *.xyz.gz or *.atom file." << endl;
 		abort();
 	}
 
@@ -392,11 +393,11 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		}
 		
 		// Attempt to find box vectors in header
-		vector<string> sections = rotational_order_split(line,' ');
+		vector<string> sections = split(line,' ');
 		for(unsigned i = 0 ; i < sections.size() ; i++){
-			vector<string> elements = rotational_order_split(sections.at(i),'=');
+			vector<string> elements = split(sections.at(i),'=');
 			if(elements.size()>0 && elements.at(0)=="sim_box" && elements.size()==2){
-				vector<string> vars = rotational_order_split(elements.at(1),',');
+				vector<string> vars = split(elements.at(1),',');
 				if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" && vars.size()==4){
 					Lx = atof(vars.at(1).c_str()); 
 					Ly = atof(vars.at(2).c_str()); 
@@ -429,7 +430,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		while(not_done){
 			if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 			getline(in,line);
-			vector<string> sections = rotational_order_split(line,' ');
+			vector<string> sections = split(line,' ');
 			if(sections.size()>3 && sections.at(0)=="ITEM:" && sections.at(1)=="NUMBER" && sections.at(2)=="OF" && sections.at(3)=="ATOMS"){
 				current_frame++;
 				if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
@@ -445,15 +446,15 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 			}
 			else if(sections.size()>2 && sections.at(0)=="ITEM:" && sections.at(1)=="BOX" && sections.at(2)=="BOUNDS" ){
 				getline(in,line);
-				vector<string> vars=rotational_order_split(line,' ');
+				vector<string> vars=split(line,' ');
 				if(vars.size()>1)
 					Lx=atof(vars.at(1).c_str())-atof(vars.at(0).c_str());
 				getline(in,line);
-				vars=rotational_order_split(line,' ');
+				vars=split(line,' ');
 				if(vars.size()>1)
 					Ly=atof(vars.at(1).c_str())-atof(vars.at(0).c_str());
 				getline(in,line);
-				vars=rotational_order_split(line,' ');
+				vars=split(line,' ');
 				if(vars.size()>1)
 					Lz=atof(vars.at(1).c_str())-atof(vars.at(0).c_str());
 				//cout << " Lx = " << Lx << " Ly = " << Ly << " Lz = " << Lz << endl;
@@ -462,7 +463,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 				for(unsigned n=0;n<num_atoms;n++){
 					if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 					getline(in,line);
-					vector<string> vars=rotational_order_split(line,' ');
+					vector<string> vars=split(line,' ');
 					if(vars.size()>4){
 						unsigned i = atoi(vars.at(0).c_str())-1;
 						//cout << i << endl;
@@ -498,7 +499,7 @@ void Rotational_order::write_xyz(string ofilename,double Qmin,double Qmax){
 	double Ql    = 0;for(unsigned i=0;i<number_of_particles();i++) Ql += qi.at(i);Ql/=(double)number_of_particles();
 	double QlAvg = 0;for(unsigned i=0;i<number_of_particles();i++) QlAvg += qiAvg.at(i);QlAvg/=(double)number_of_particles();
 	
-	vector<string> fnames = rotational_order_split(ofilename,'.');
+	vector<string> fnames = split(ofilename,'.');
 	filtering_ostream out;
 	if(fnames.size()<2){
 		cerr << "error: Incompatible name of output file. Should be *.xyz or *.xyz.gz" << endl;
