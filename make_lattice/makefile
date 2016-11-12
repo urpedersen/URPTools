@@ -1,7 +1,25 @@
-all: src/make_lattice.cc
-	mkdir -p bin
-	g++ -O3 ./src/split.h ./src/split.cc ./src/lattice.h ./src/lattice.cc ./src/make_lattice.cc -lboost_iostreams -o ./bin/make_lattice
+CC = g++
+CFLAGS  = -O3 -Wall
+INCLUDES = 
+LFLAGS = 
+LIBS = -lboost_iostreams
 
-clean: 
-	rm bin/make_lattice
-	rmdir bin
+SRCS = ./src/make_lattice.cc ./src/lattice.cc ./src/split.cc 
+OBJS = $(SRCS:.cc=.o)
+MAIN = ./bin/make_lattice
+
+.PHONY: clean
+
+all:    $(MAIN)
+	@echo   The program is compiled. The executable is located in the ./bin directory.
+
+$(MAIN): $(OBJS) 
+	mkdir -p bin
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+
+.cc.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
+
+clean:
+	$(RM) ./src/*.o src./*~ $(MAIN)
+
