@@ -4,17 +4,21 @@ INCLUDES =
 LFLAGS = 
 LIBS = -lboost_iostreams
 
-SRCS = ./src/make_lattice.cc ./src/lattice.cc ./src/split.cc 
+SRCDIR = src
+SRCS = $(SRCDIR)/make_lattice.cc $(SRCDIR)/lattice.cc $(SRCDIR)/split.cc 
 OBJS = $(SRCS:.cc=.o)
-MAIN = ./bin/make_lattice
+MAINDIR = bin
+MAIN = $(MAINDIR)/make_lattice
 
-.PHONY: clean
+MKDIR = mkdir -p
+
+.PHONY: clean subdirs $(SUBDIRS)
 
 all:    $(MAIN)
 	@echo   The program is compiled. The executable is located in the ./bin directory.
 
-$(MAIN): $(OBJS) 
-	mkdir -p bin
+$(MAIN): $(OBJS)
+	$(MKDIR) $(MAINDIR)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 
 .cc.o:
