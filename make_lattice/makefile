@@ -12,7 +12,7 @@ MAIN = $(MAINDIR)/make_lattice
 
 MKDIR = mkdir -p
 
-.PHONY: clean subdirs $(SUBDIRS)
+.PHONY: clean
 
 all:    $(MAIN)
 	@echo   The program is compiled. The executable is located in the ./bin directory.
