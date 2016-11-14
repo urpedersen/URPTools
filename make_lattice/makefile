@@ -1,7 +1,7 @@
-CC = g++
-CFLAGS  = -O3 -Wall
-INCLUDES = 
-LFLAGS = 
+CXX = g++
+CXXFLAGS  = -O3 -Wall
+LDFLAGS =
+CPPFLAGS = 
 LIBS = -lboost_iostreams
 
 SRCDIR = src
@@ -19,11 +19,11 @@ all:    $(MAIN)
 
 $(MAIN): $(OBJS)
 	$(MKDIR) $(MAINDIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(MAIN) $(OBJS) $(LDFLAGS) $(LIBS)
 
 .cc.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<  -o $@
 
 clean:
-	$(RM) ./src/*.o src./*~ $(MAIN)
+	$(RM) -r $(MAINDIR) ./src/*.o src./*~ $(MAIN)
 
