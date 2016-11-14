@@ -25,5 +25,4 @@ $(MAIN): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<  -o $@
 
 clean:
-	$(RM) -r $(MAINDIR) ./src/*.o src./*~ $(MAIN)
-
+	$(RM) -r $(MAINDIR) $(SRCDIR)/*.o $(SRCDIR)/*~ $(MAIN)
