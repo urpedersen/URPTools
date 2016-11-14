@@ -1,25 +1,28 @@
-CC = g++
-CFLAGS  = -O3 -Wall
-INCLUDES = 
-LFLAGS = 
+CXX = g++
+CXXFLAGS  = -O3 -Wall
+LDFLAGS =
+CPPFLAGS = 
 LIBS = -lboost_iostreams
 
-SRCS = ./src/Q6.cc ./src/Rotational_order.cc ./src/Cell_list.cc ./src/split.cc 
+SRCDIR = src
+SRCS = $(SRCDIR)/Q6.cc $(SRCDIR)/Rotational_order.cc $(SRCDIR)/Cell_list.cc $(SRCDIR)/split.cc 
 OBJS = $(SRCS:.cc=.o)
-MAIN = ./bin/Q6
+MAINDIR = bin
+MAIN = $(MAINDIR)/Q6
+
+MKDIR = mkdir -p
 
 .PHONY: clean
 
 all:    $(MAIN)
 	@echo   The program is compiled. The executable is located in the ./bin directory.
 
-$(MAIN): $(OBJS) 
-	mkdir -p bin
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+$(MAIN): $(OBJS)
+	$(MKDIR) $(MAINDIR)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(MAIN) $(OBJS) $(LDFLAGS) $(LIBS)
 
 .cc.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<  -o $@
 
 clean:
-	$(RM) ./src/*.o src./*~ $(MAIN)
-
+	$(RM) -r $(MAINDIR) $(SRCDIR)/*.o $(SRCDIR)/*~ $(MAIN)
