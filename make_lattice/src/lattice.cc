@@ -1,4 +1,4 @@
-/*
+/**
  * Lattice.cc
  *
  *  Created on: Nov 9, 2015
@@ -55,7 +55,7 @@ Lattice::Lattice(string in_lattice_type,unsigned nx, unsigned ny,unsigned nz,uns
 			in.push(gzip_decompressor());
 			in.push(file_source(in_lattice_type));
 		} else {
-			cerr << "error: Unknown name of input file for lattice. Should be an *.xyz, *.xyz.gz or file." << endl;
+			cerr << "error: Unknown name of input file for lattice coordinates. Should be an *.xyz, *.xyz.gz or file." << endl;
 			abort();
 		}
 		// TODO read the lattice file

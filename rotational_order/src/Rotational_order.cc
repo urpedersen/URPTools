@@ -24,7 +24,7 @@
 
 #include "split.h"
 #include "Cell_list.h"
-#include "../../cluster_analysis/src/cluster_analysis.h"
+#include "cluster_analysis.h"
 
 using namespace std;
 

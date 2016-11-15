@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS  = -O3 -Wall
 LDFLAGS =
-CPPFLAGS = 
+CPPFLAGS = -I../cluster_analysis/src
 LIBS = -lboost_iostreams
 
 SRCDIR = src
@@ -15,7 +15,7 @@ MKDIR = mkdir -p
 .PHONY: clean
 
 all:    $(MAIN)
-	@echo   The program is compiled. The executable is located in the ./bin directory.
+	@echo   The program $(MAIN) successfully is compiled.
 
 $(MAIN): $(OBJS)
 	$(MKDIR) $(MAINDIR)
