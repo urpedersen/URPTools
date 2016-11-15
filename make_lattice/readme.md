@@ -16,11 +16,11 @@ make
 to generate an executable into the bin library.
 
 ## Usage
+Type 
 ```
-make
-./bin/make_lattice
+./bin/make_lattice -h
 ```
-Use the -h flag for help.
+for information on using the program.
 
 ## Tools
 The directory Tools contains two script that converts xyz-files to the [Gromacs format](http://manual.gromacs.org/current/online/gro.html)
