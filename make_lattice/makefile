@@ -15,7 +15,7 @@ MKDIR = mkdir -p
 .PHONY: clean
 
 all:    $(MAIN)
-	@echo   The program $(MAIN) successfully is compiled.
+	@echo   The program $(MAIN) is successfully compiled.
 
 $(MAIN): $(OBJS)
 	$(MKDIR) $(MAINDIR)
