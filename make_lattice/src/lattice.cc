@@ -20,10 +20,9 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
 
-#include "split.h"
+#include "split.h"    // Split a string into a vector<string>
 
 using namespace std;
-
 
 /**
  *
@@ -44,9 +43,11 @@ Lattice::Lattice(string in_lattice_type,unsigned nx, unsigned ny,unsigned nz,uns
 	{
 	srand(seed);
 	
-	// Attempt to load a file if *.xyz or *.xyz.gz is given as lattice type
+
+	// Load a lattice from a file if *.xyz or *.xyz.gz is given as the input lattice type
 	vector<string> fnames = split(in_lattice_type,'.');
 	if (fnames.size()>1) {
+		// Setup input stream from file
 		using namespace boost::iostreams;
 		filtering_istream in;
 		if(fnames.back()=="xyz"){
@@ -58,11 +59,67 @@ Lattice::Lattice(string in_lattice_type,unsigned nx, unsigned ny,unsigned nz,uns
 			cerr << "error: Unknown name of input file for lattice coordinates. Should be an *.xyz, *.xyz.gz or file." << endl;
 			abort();
 		}
-		// TODO read the lattice file
-	}
-	
-	// Use identifyer of build-in lattice types
-	if(lattice_type=="sc"){			// Simple cubic
+		if(!in.good()){
+			cerr << "error: while reading " << in_lattice_type << endl;
+			abort();
+		}
+		string line;
+
+		// Read meta information in header
+		getline(in,line); // Number of atoms
+		unsigned num_atoms=atoi(line.c_str());
+		getline(in,line); // Comment line
+
+		// Find box vectors in comment line
+		Lx=1.0;
+		Ly=1.0;
+		Lz=1.0;
+		vector<string> sections = split(line,' ');
+		bool read_sim_box = false;
+		for(unsigned i = 0 ; i < sections.size() ; i++){
+			vector<string> elements = split(sections.at(i),'=');
+			if(elements.size()>0 && elements.at(0)=="sim_box" && elements.size()==2){
+				vector<string> vars = split(elements.at(1),',');
+				if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" && vars.size()==4){
+					Lx = atof(vars.at(1).c_str());
+					Ly = atof(vars.at(2).c_str());
+					Lz = atof(vars.at(3).c_str());
+					read_sim_box = true;
+				}
+			}
+		}
+		if(!read_sim_box) cout << "Warning: The file " << in_lattice_type 
+			<< " did not contain a sim_box=RectangularSimulationBox,NUM,NUM,NUM in the header. Using default  sim_box=RectangularSimulationBox,1.0,1.0,1.0."
+			<< endl;
+
+		// Read atom position
+		for(unsigned i=0;i<num_atoms;i++){
+			if(!in.good()){
+				cerr << "error: while reading " << in_lattice_type << endl;
+				abort();
+			}
+			getline(in,line);
+			char * pEnd;
+			int    i0;
+			double d0, d1, d2;
+			i0 = strtol (line.c_str(),&pEnd,10);
+			d0 = strtod (pEnd,&pEnd);
+			d1 = strtod (pEnd,&pEnd);
+			d2 = strtod (pEnd,&pEnd);
+			for(unsigned ix=0;ix<nx;ix++){
+				for(unsigned iy=0;iy<ny;iy++){
+					for(unsigned iz=0;iz<nz;iz++){
+						addParticle(i0,ix*Lx+d0,iy*Ly+d1,iz*Lz+d2);
+					}
+				}
+			}
+		}
+
+		// Reset to new box size
+		Lx*=nx;
+		Ly*=ny;
+		Lz*=nz;
+	} else if(lattice_type=="sc"){			// Simple cubic
 		for(unsigned ix=0;ix<nx;ix++){
 			for(unsigned iy=0;iy<ny;iy++){
 				for(unsigned iz=0;iz<nz;iz++){
@@ -115,8 +172,7 @@ Lattice::Lattice(string in_lattice_type,unsigned nx, unsigned ny,unsigned nz,uns
 				}
 			}
 		}
-	}
-	else if(lattice_type=="bcc"){	// Body centre cubic
+	} else if(lattice_type=="bcc"){	// Body centre cubic
 		for(unsigned ix=0;ix<nx;ix++){
 			for(unsigned iy=0;iy<ny;iy++){
 				for(unsigned iz=0;iz<nz;iz++){
@@ -154,30 +210,30 @@ Lattice::Lattice(string in_lattice_type,unsigned nx, unsigned ny,unsigned nz,uns
 		scale_y_coordinates(ny*sqrt(3.0));
 		scale_z_coordinates(nz*sqrt(8.0/3.0));
 	} else if (lattice_type=="hex") {	// Hexagonal layers
-			for(unsigned ix=0;ix<nx;ix++) {
-				for(unsigned iy=0;iy<ny;iy++) {
-					for(unsigned iz=0;iz<nz;iz++) {
-						addParticle(0,ix+0.0,iy+0.0,iz+0.0);
-						addParticle(0,ix+0.5,iy+0.5,iz+0.0);
-					}
+		for(unsigned ix=0;ix<nx;ix++) {
+			for(unsigned iy=0;iy<ny;iy++) {
+				for(unsigned iz=0;iz<nz;iz++) {
+					addParticle(0,ix+0.0,iy+0.0,iz+0.0);
+					addParticle(0,ix+0.5,iy+0.5,iz+0.0);
 				}
 			}
-			scale_y_coordinates(ny*sqrt(3.0));
+		}
+		scale_y_coordinates(ny*sqrt(3.0));
 	} else if (lattice_type=="dc") {	// Diamond cubic lattice
-			for(unsigned ix=0;ix<nx;ix++){
-				for(unsigned iy=0;iy<ny;iy++){
-					for(unsigned iz=0;iz<nz;iz++){
-						addParticle(0,ix+0.00,iy+0.00,iz+0.00);
-						addParticle(0,ix+0.00,iy+0.50,iz+0.50);
-						addParticle(0,ix+0.50,iy+0.00,iz+0.50);
-						addParticle(0,ix+0.50,iy+0.50,iz+0.00);
-						addParticle(0,ix+0.75,iy+0.75,iz+0.75);
-						addParticle(0,ix+0.75,iy+0.25,iz+0.25);
-						addParticle(0,ix+0.25,iy+0.75,iz+0.25);
-						addParticle(0,ix+0.25,iy+0.25,iz+0.75);
-					}
+		for(unsigned ix=0;ix<nx;ix++){
+			for(unsigned iy=0;iy<ny;iy++){
+				for(unsigned iz=0;iz<nz;iz++){
+					addParticle(0,ix+0.00,iy+0.00,iz+0.00);
+					addParticle(0,ix+0.00,iy+0.50,iz+0.50);
+					addParticle(0,ix+0.50,iy+0.00,iz+0.50);
+					addParticle(0,ix+0.50,iy+0.50,iz+0.00);
+					addParticle(0,ix+0.75,iy+0.75,iz+0.75);
+					addParticle(0,ix+0.75,iy+0.25,iz+0.25);
+					addParticle(0,ix+0.25,iy+0.75,iz+0.25);
+					addParticle(0,ix+0.25,iy+0.25,iz+0.75);
 				}
 			}
+		}
 	} else if (lattice_type=="NaCl") {	// Rock salt lattice
 		for(unsigned ix=0;ix<nx;ix++){
 			for(unsigned iy=0;iy<ny;iy++){
@@ -231,6 +287,7 @@ Lattice::Lattice(string in_lattice_type,unsigned nx, unsigned ny,unsigned nz,uns
 		cerr << "error: unknown lattice type " << lattice_type << "." << endl;
 		abort();
 	}
+	
 	for(unsigned i=0;i<number_of_types();i++)
 		mass_of_types.push_back(1.0);
 	// translate lattice to origin at center of box

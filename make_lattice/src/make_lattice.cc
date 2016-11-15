@@ -19,7 +19,7 @@
 #include <boost/iostreams/device/file.hpp>
 
 #include "lattice.h"
-#include "split.h"
+#include "split.h"    // Split a string into a vector<string>
 
 using namespace std;
 
@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
 	bool quiet = false;
 	string filename = "start.xyz.gz";
 	double density=1.0;
+	bool   density_is_given_as_input=false;
 	double min_distance=-1.0;
 	double Lx=-1.0;
 	double Ly=-1.0;
@@ -95,6 +96,7 @@ int main(int argc, char **argv) {
 			cout << "                                 dc     Diamond cubic lattice (n=8)." << endl;
 			cout << "                                 NaCl   Rock salt lattice. (n=2x4)" << endl;
 			cout << "                                 CsCl   Cesium Chloride lattice (n=2x1)." << endl;
+			cout << " -l, --lattice=FILE            Read unit-cell from a *.xyz or *.xyz.gz file." << endl;
 			cout << " -c, --cells=INT               Set number of unit cells. Default: 5." << endl;
 			cout << "     --cells=INT,INT,INT       " << endl;
 			cout << " -N, --num_par=INT,INT,...     Reset particle types in lattice." << endl;
@@ -137,6 +139,7 @@ int main(int argc, char **argv) {
 			break;
 		case 'r':
 			density=atof(optarg);
+			density_is_given_as_input=true;
 			break;
 		case 'd':
 			min_distance=atof(optarg);
@@ -207,7 +210,7 @@ int main(int argc, char **argv) {
 	lattice.reset_mass_of_types(mass);
 
 	// Reset box volume
-	if(density>0.0)
+	if(density_is_given_as_input)
 		lattice.set_density(density);
 	if(!(Lx<0.0))
 		lattice.scale_x_coordinates(Lx);
