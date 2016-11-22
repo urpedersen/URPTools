@@ -100,7 +100,6 @@ int main(int argc, char **argv) {
 			cout << "                                  The default value of -1.0 skips computation." << endl;
 			cout << "                                  A sparse matrix is written to node_connections.dat and" << endl;
 			cout << "                                  the largest cluster is written to largest_cluster.xyz." << endl;
-			cout << "                                  The Lechner-Dellago vectors are used to compute Sij." << endl; 
 			cout << " -o, --output=FILE  [none]      Output file (*.xyz or *.xyz.gz)." << endl;
 			cout << "                                  Default value does not produce an output file." << endl;
 			cout << "                                  The 5th column gives number of neighbours. " << endl;
