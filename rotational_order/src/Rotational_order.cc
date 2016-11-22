@@ -61,10 +61,23 @@ Rotational_order::Rotational_order() :
 }
 
 Rotational_order::~Rotational_order() {
+	this->clear();
+}
+
+/**
+* Clear memory for a new computation
+*/ 
+void Rotational_order::clear() {
 	type.clear();
 	x.clear();
 	y.clear();
 	z.clear();
+	number_of_neighbors.clear();
+	number_of_S_connections.clear();
+	qlm.clear();
+	qi.clear();
+	qlmAvg.clear();
+	qiAvg.clear();
 }
 
 
@@ -186,6 +199,10 @@ void Rotational_order::compute_ql(unsigned in_degree){
 	}// Done looping particles
 }
 
+/**
+* Compute Sij connection matrix between crystalline particles. 
+*   And find the larges cluster of connected particles.
+*/
 void Rotational_order::compute_Sij(double S_min,string filename,string filename_cluster){
 	
 	ofstream out;
@@ -308,39 +325,19 @@ double Rotational_order::volume(){
 }
 
 
-/*
-void Rotational_order::load_xyz(ifstream& ifile){
-		string line;
-		getline(ifile,line);
-		unsigned num_atoms=atoi(line.c_str());
-		getline(ifile,line); // Comment line
-		unsigned line_counter=0;
-		for(unsigned i=0;i<num_atoms;i++){
-				getline(ifile,line);
-				char * pEnd;
-				int    i0;
-				double d0, d1, d2;
-				i0 = strtol (line.c_str(),&pEnd,10);
-				d0 = strtod (pEnd,&pEnd);
-				d1 = strtod (pEnd,&pEnd);
-				d2 = strtod (pEnd,&pEnd);
-				type.push_back(i0);
-				x.push_back(d0);
-				y.push_back(d1);
-				z.push_back(d2);
-		}
-	
-	
-}
-*/
-
-
 /**
 * Load coordinates of particles from xyz-file or an zipped xyz.gz file or a LAMMPS *.atom file
 */
-void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,double in_Ly,double in_Lz,double in_neighbour_cutoff){
+bool Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,double in_Ly,double in_Lz,double in_neighbour_cutoff){
 	using namespace boost::iostreams;
+
+	type.clear();
+	x.clear();
+	y.clear();
+	z.clear();
+	number_of_neighbors.clear();
 	
+	bool sucessfull_load_of_frame = true;
 	string fileformat="";
 
 	Lx=in_Lx;
@@ -352,7 +349,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 	vector<string> fnames = split(ifilename,'.');
 	//in.push(file_source(ifilename));
 	if(fnames.size()<2){
-		cerr << "error: Incompatible name of input file. Should be an *.xyz or *.xyz.gz file." << endl;
+		cerr << "error: Incompatible name of input file. Should be an *.xyz, *.xyz.gz or atom file." << endl;
 		abort();
 	}
 	if(fnames.back()=="atom"){
@@ -374,22 +371,24 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 	
 	string line;
 	if(fileformat=="xyz"){ // READ xyz file 
-		if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 		// Begin to read header of selected frame
 		getline(in,line); // Number of atoms
+		if(!in.good()) sucessfull_load_of_frame = false;
 		unsigned num_atoms=atoi(line.c_str());
 		getline(in,line); // Comment line
+		if(!in.good()) sucessfull_load_of_frame = false;
 		
 		// Skip frames
 		for(unsigned f=0;f<frame;f++){
 			for(unsigned i = 0;i<num_atoms;i++){
-				if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 				getline(in,line);
+				if(!in.good()) sucessfull_load_of_frame = false;
 			}
-			if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 			getline(in,line); // Number of atoms
+			if(!in.good())	sucessfull_load_of_frame = false;
 			num_atoms=atoi(line.c_str());
 			getline(in,line); // Comment line
+			if(!in.good())	sucessfull_load_of_frame = false;
 		}
 		
 		// Attempt to find box vectors in header
@@ -408,7 +407,8 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 	
 		// Read atom positions in xyz file
 		for(unsigned i=0;i<num_atoms;i++){
-			if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
+			if(!in.good())	sucessfull_load_of_frame = false;
+			
 			getline(in,line);
 			char * pEnd;
 			int    i0;
@@ -422,19 +422,29 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 			y.push_back(d1);
 			z.push_back(d2);
 		}
-	} else if( fileformat=="lammps" ) {
+	} else if( fileformat=="lammps" ) { 
 	
 		unsigned current_frame = -1;
 		unsigned num_atoms=0;
 		bool not_done=true;
 		while(not_done){
-			if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 			getline(in,line);
+			if(!in.good()){
+				sucessfull_load_of_frame = false;
+				not_done=false;
+			}
+			if(!in.good()){
+				sucessfull_load_of_frame = false;
+				not_done=false;
+			}
 			vector<string> sections = split(line,' ');
 			if(sections.size()>3 && sections.at(0)=="ITEM:" && sections.at(1)=="NUMBER" && sections.at(2)=="OF" && sections.at(3)=="ATOMS"){
 				current_frame++;
-				if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 				getline(in,line);
+				if(!in.good()){
+					sucessfull_load_of_frame = false;
+					not_done=false;
+				}
 				num_atoms=atoi(line.c_str());
 				//cout << " num_atoms = " << num_atoms << " current_frame = " << current_frame << endl;
 				if(frame==current_frame){
@@ -461,8 +471,8 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 			}else if(sections.size()>1 && sections.at(0)=="ITEM:" && sections.at(1)=="ATOMS" && current_frame==frame){
 				if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 				for(unsigned n=0;n<num_atoms;n++){
-					if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 					getline(in,line);
+					if(!in.good()){cerr << "error: while reading " << ifilename << endl;abort();}
 					vector<string> vars=split(line,' ');
 					if(vars.size()>4){
 						unsigned i = atoi(vars.at(0).c_str())-1;
@@ -481,6 +491,7 @@ void Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 		cerr << "error: Unknown input file format. filename = " <<  ifilename;
 	}
 	//cout << "Done reading " << ifilename << " Lx = " << Lx << " Ly = " << Ly << " Lz = " << Lz <<  " num_atoms = " << x.size() << endl;
+	return sucessfull_load_of_frame;
 }
 
 

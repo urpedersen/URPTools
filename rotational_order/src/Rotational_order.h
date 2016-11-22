@@ -33,7 +33,9 @@ private:
 public:
 	Rotational_order();
 	virtual ~Rotational_order();
-
+	
+	void clear();  /// Clear memory for a new computation
+	
 	void addParticle(unsigned in_type,double in_x,double in_y,double in_z);
 
 	void compute_ql(unsigned in_degree);
@@ -41,7 +43,7 @@ public:
 
 	//void translate_all_particles(double dx,double dy,double dz);
 	//void load_xyz(ifstream& in);
-	void  load_xyz(string ifilename,unsigned frame,double Lx,double Ly,double Lz,double neighbour_cutoff);
+	bool  load_xyz(string ifilename,unsigned frame,double Lx,double Ly,double Lz,double neighbour_cutoff);
 	//void write_xyz(ostream& out);
 	void write_xyz(string ofilename,double Qmin, double Qmax);
 

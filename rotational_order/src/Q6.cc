@@ -38,6 +38,7 @@ int main(int argc, char **argv) {
 	unsigned degree = 6;
 	string ifilename = "traj.xyz";
 	unsigned frame=0;
+	bool scan=false;
 	double Lx=10,Ly=10,Lz=10;
 	double neighbour_cutoff=1.4;
 	string ofilename = "none";
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
 				{"degree",	optional_argument, 0, 'l'},
 				{"input",	optional_argument, 0, 'i'},
 				{"frame",	optional_argument, 0, 'f'},
+				{"scan",	optional_argument, 0, 's'},
 				{"Lengths",	optional_argument, 0, 'L'},
 				{"rcut",	optional_argument, 0, 'r'},
 				{"QminQmax",	optional_argument, 0, 'Q'},
@@ -63,7 +65,7 @@ int main(int argc, char **argv) {
 				{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		c = getopt_long (argc, argv, "hql:i:f:L:r:Q:S:o:",long_options,&option_index);
+		c = getopt_long (argc, argv, "hql:i:f:sL:r:Q:S:o:",long_options,&option_index);
 		if(c==-1) break;
 		switch (c) {
 		/*case 0:
@@ -89,6 +91,7 @@ int main(int argc, char **argv) {
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
 			cout << " -i, --input=FILE   [traj.xyz]  Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
 			cout << " -f, --frame=INT    [0]         Frame of input file (0=first frame)." << endl;
+			cout << " -s, --scan                     Scan frames in files (only std output)." << endl; // TODO make output files for each frame
 			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box," << endl;
 			cout << "     --Lenghts=NUM,NUM,NUM        unless it is provided in the input file." << endl; 
 			cout << " -Q  --QminQmax=NUM,NUM         Minimum and maximum q6 limits" << endl;
@@ -121,6 +124,9 @@ int main(int argc, char **argv) {
 			break;
 		case 'f':
 			frame = atoi(optarg);
+			break;
+		case 's':
+			scan = true;
 			break;
 		case 'L':
 			vecstr = split(optarg,',');
@@ -167,21 +173,36 @@ int main(int argc, char **argv) {
 
 	// Create object to compute rotational order
 	Rotational_order rot;
-	rot.load_xyz(ifilename,frame,Lx,Ly,Lz,neighbour_cutoff);
+	bool sucessfull_load = rot.load_xyz(ifilename,frame,Lx,Ly,Lz,neighbour_cutoff);
 	rot.compute_ql(degree);
-	if(Sij_min>-1.0) {
-		rot.compute_Sij(Sij_min,"node_connections.dat","largest_cluster.xyz");
-		if(!quiet)
-			cout << "Wrote Sij matrix to node_connections.dat and largest cluster of connected particles to largest_cluster.xyz." << endl;
-	}
-	if(ofilename!="none"){
-		rot.write_xyz(ofilename,Qmin,Qmax);
-		cout << "Wrote " << ofilename <<" with local bond-orderparamters of particles within Qmin and Qmax values." << endl;
+	if(!sucessfull_load){
+		cout << "error: Could not load frame " << frame << " in " << ifilename << endl;
+		abort();
 	}
 
-	// Say goodby to the nice user (unless you are asked to be quiet). 
-	if(!quiet){
-		cout << rot.info(Qmin,Qmax) << endl << endl;
+	if(scan){	// Run program in scanning mode TODO write to the output file when scanning
+		while(sucessfull_load) {
+			if(!quiet){
+				cout << "frame:                        " << frame << endl;
+				cout << rot.info(Qmin,Qmax) << endl;
+			}
+			frame++;
+			sucessfull_load = rot.load_xyz(ifilename,frame,Lx,Ly,Lz,neighbour_cutoff);
+			rot.compute_ql(degree);
+		}
+	} else {	// Run program on a single frame
+		if(Sij_min>-1.0) {
+			rot.compute_Sij(Sij_min,"node_connections.dat","largest_cluster.xyz");
+			if(!quiet)
+				cout << "Wrote Sij matrix to node_connections.dat and largest cluster of connected particles to largest_cluster.xyz." << endl;
+		}
+		if(ofilename!="none"){
+			rot.write_xyz(ofilename,Qmin,Qmax);
+			cout << "Wrote " << ofilename <<" with local bond-orderparamters of particles within Qmin and Qmax values." << endl;
+		}
+		// Print summary information
+		if(!quiet)
+			cout << rot.info(Qmin,Qmax) << endl;
 	}
 	
 	return 0;
