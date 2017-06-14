@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
 			cout << " -i, --input=FILE   [traj.xyz]  Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
 			cout << " -f, --frame=INT    [0]         Frame of input file (0=first frame)." << endl;
-			cout << " -s, --scan                     Scan frames in files (only std output)." << endl; // TODO make output files for each frame
+			cout << " -s, --scan                     Scan frames in file (only std output)." << endl; // TODO make output files for each frame
 			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box," << endl;
 			cout << "     --Lenghts=NUM,NUM,NUM        unless it is provided in the input file." << endl; 
 			cout << " -Q  --QminQmax=NUM,NUM         Minimum and maximum q6 limits" << endl;
