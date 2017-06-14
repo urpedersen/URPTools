@@ -38,6 +38,7 @@ Optional flags:     [default]
  -r, --rcut=NUM     [1.4]       Neighbour cutoff distance.
  -i, --input=FILE   [traj.xyz]  Input file (*.xyz, *.xyz.gz or *.atom).
  -f, --frame=INT    [0]         Frame of input file (0=first frame).
+ -s, --scan                     Scan frames in files (only std output).
  -L, --Lenghts=NUM  [10]        Size of periodic box,
      --Lenghts=NUM,NUM,NUM        unless it is provided in the input file.
  -Q  --QminQmax=NUM,NUM         Minimum and maximum q6 limits
@@ -54,7 +55,6 @@ Optional flags:     [default]
                                   The 7th column gives Lechner-Dellago bond-order. 
                                   The 8th column gives the number of Sij connections, 
                                   if the -S flag is used. 
-
 ```
 ### References
 * P. Steinhardt, D. Nelson, and M. Ronchetti, Phys. Rev. B 28, 784 (1983), https://doi.org/10.1103/PhysRevB.28.784
