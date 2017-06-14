@@ -38,7 +38,7 @@ Optional flags:     [default]
  -r, --rcut=NUM     [1.4]       Neighbour cutoff distance.
  -i, --input=FILE   [traj.xyz]  Input file (*.xyz, *.xyz.gz or *.atom).
  -f, --frame=INT    [0]         Frame of input file (0=first frame).
- -s, --scan                     Scan frames in files (only std output).
+ -s, --scan                     Scan frames in file (only std output).
  -L, --Lenghts=NUM  [10]        Size of periodic box,
      --Lenghts=NUM,NUM,NUM        unless it is provided in the input file.
  -Q  --QminQmax=NUM,NUM         Minimum and maximum q6 limits
