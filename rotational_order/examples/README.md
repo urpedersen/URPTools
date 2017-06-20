@@ -47,7 +47,7 @@ The program can also read output in the LAMMPS format:
 ## Computing Q4 (or other degrees)
 The degree of the speherical harmonics used for the bond-order can be changed with the `-l` flag like this
 ```
-../bin/Q6 -l4
+../bin/Q6 -i fcc.xyz -l4
 ```
 ## Scan a trajectory
 The program can analyse concatenated configurations if the `-s` flag is used:
