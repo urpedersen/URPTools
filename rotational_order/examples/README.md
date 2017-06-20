@@ -9,7 +9,7 @@ The following command will run the program on a configuration with a fcc crystal
 ```
 ../bin/Q6 -i fcc.xyz
 ```
-The following is writen to the standard output
+and gived the output
 ```
 Total number of particles:    500
 Number of types:              1
