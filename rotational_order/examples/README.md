@@ -83,9 +83,9 @@ The plot suggest that we have a liqud and a crystaline fcc slap (henche the name
 ## Selecting particles
 We can select particles that are within a range with the following commands:
 ```
-../bin/Q6 -i liq_fcc.xyz -Q0.30,1.00 -o slap_cry.xyz
-../bin/Q6 -i liq_fcc.xyz -Q0.00,0.25 -o slap_liq.xyz
-../bin/Q6 -i liq_fcc.xyz -Q0.25,0.30 -o slap_between.xyz
+../bin/Q6 -i liq_fcc.xyz -Q0.30,1.00 -o slab_cry.xyz
+../bin/Q6 -i liq_fcc.xyz -Q0.00,0.25 -o slab_liq.xyz
+../bin/Q6 -i liq_fcc.xyz -Q0.25,0.30 -o slab_between.xyz
 ```
 
 # Cluster analysis
