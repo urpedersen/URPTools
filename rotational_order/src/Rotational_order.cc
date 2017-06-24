@@ -290,6 +290,61 @@ void Rotational_order::compute_Sij(double S_min,string filename,string filename_
 	out_cluster.close();
 }
 
+
+
+/** 
+* Return the origin to a vector
+*/
+vector<double> Rotational_order::get_center(double Qmin,double Qmax){
+	vector<double> out(3,0);
+	double xo=0.0; // Coordinates of the geometric
+	double yo=0.0; //   center of the selected particles
+	double zo=0.0;
+
+	// Find center of mass of selected particles
+	unsigned numSelected = 0;
+	for (unsigned p=0;p<number_of_particles();p++){
+		if(qiAvg.at(p)>Qmin && qiAvg.at(p)<Qmax){
+			xo+=x.at(p);
+			yo+=y.at(p);
+			zo+=z.at(p);
+			numSelected++;
+		}
+	}
+	xo/=(double)numSelected;
+	yo/=(double)numSelected;
+	zo/=(double)numSelected;
+	
+	out.at(0) = xo;
+	out.at(1) = yo;
+	out.at(2) = zo;
+	
+	return out;
+}
+
+/**
+*  Put geometrical origin of particles within selected Q range at the origin
+*/
+void Rotational_order::center(double Qmin,double Qmax){
+
+	vector<double> center;
+	center = get_center(Qmin,Qmax);
+
+	// Shift all particles
+	for (unsigned p=0;p<number_of_particles();p++){
+		x.at(p)-=center.at(0);
+		//x.at(p)+=0.5*Lx-floor(x.at(p)/Lx);
+		y.at(p)-=center.at(1);
+		//y.at(p)+=0.5*Ly-floor(y.at(p)/Ly);
+		z.at(p)-=center.at(2);
+		//z.at(p)+=0.5*Lz-floor(z.at(p)/Lz);
+		// Wrap boundaries
+		
+	}
+	cout << "Translated particles taking  ( " << center.at(0) << " , " << center.at(1) << " , " << center.at(2) << ") to the origo."<< endl;
+}
+
+
 /**
  * Return the number of particles
  */
@@ -494,6 +549,17 @@ bool Rotational_order::load_xyz(string ifilename,unsigned frame,double in_Lx,dou
 	return sucessfull_load_of_frame;
 }
 
+void Rotational_order::wrap_into_box(double xO,double yO,double zO){
+	for (unsigned p=0;p<number_of_particles();p++){
+		x.at(p)-=xO;
+		y.at(p)-=yO;
+		z.at(p)-=zO;
+		x.at(p)-=Lx*round(x.at(p)/Lx);
+		y.at(p)-=Ly*round(y.at(p)/Ly);
+		z.at(p)-=Lz*round(z.at(p)/Lz);
+	}
+}
+
 
 /**
  * Write coordinates of particles to xyz-file.
@@ -554,16 +620,45 @@ string Rotational_order::info(double Qmin,double Qmax){
 	for (unsigned i=0;i<number_of_particles();i++) 
 		if(qiAvg.at(i)>Qmin && qiAvg.at(i)<Qmax)
 			numSelected++;
+
+	// Compute mean values of order-parameters
 	double Navg   = 0;for(unsigned i=0;i<number_of_particles();i++) Navg += (double)number_of_neighbors.at(i);Navg/=(double)number_of_particles();
 	double Ql    = 0;for(unsigned i=0;i<number_of_particles();i++) Ql += qi.at(i);Ql/=(double)number_of_particles();
 	double QlAvg = 0;for(unsigned i=0;i<number_of_particles();i++) QlAvg += qiAvg.at(i);QlAvg/=(double)number_of_particles();
 	
+	// Compute geometric information on the selected particles
+	vector<double> center;
+	center = get_center(Qmin,Qmax);
+	double x2 = 0.0;
+	double y2 = 0.0;
+	double z2 = 0.0;
+	for (unsigned i=0;i<number_of_particles();i++){
+		if(qiAvg.at(i)>Qmin && qiAvg.at(i)<Qmax){
+			x2+=(x.at(i)-center.at(0))*(x.at(i)-center.at(0));
+			y2+=(y.at(i)-center.at(1))*(y.at(i)-center.at(1));
+			z2+=(z.at(i)-center.at(2))*(z.at(i)-center.at(2));
+		}
+	}
+	x2/=(double)numSelected;
+	y2/=(double)numSelected;
+	z2/=(double)numSelected;
+
+	// Count types amongst the selected particles
+	vector<unsigned> number_of_selected_particles_of_type(3,0);
+	for (unsigned i=0;i<number_of_particles();i++)
+		if(qiAvg.at(i)>Qmin && qiAvg.at(i)<Qmax)
+			number_of_selected_particles_of_type.at(type.at(i))++;
+
 	stringstream out;
 	out << "Total number of particles:    " << number_of_particles() << endl;
 	out << "Number of types:              " << number_of_types() << endl;
 	out << "Number of particles of types:";
 	for(unsigned i=0;i<number_of_types();i++)
 		out << " " << number_of_particles_of_type(i);
+	out << endl;
+	out << "Number of selected particles of types:";
+	for(unsigned i=0;i<number_of_types();i++)
+		out << " " << number_of_selected_particles_of_type.at(i);
 	out << endl;
 	out << "Lengths of box vectors:       " << Lx << " " << Ly << " " << Lz << endl;
 	out << "Box volume:                   " << volume() << endl;
@@ -576,6 +671,10 @@ string Rotational_order::info(double Qmin,double Qmax){
 	out << "Q minimum value:        Qmin= " << Qmin << endl;
 	out << "Q maximum value:        Qmax= " << Qmax << endl;
 	out << "Number of selected par.:      " << numSelected << endl;
+	out << "Geometric center:             " << center.at(0) << " " << center.at(1) << " " << center.at(2) << endl; 
+	out << "Variance in positions:        " << x2 << " " << y2 << " " << z2 << endl;
+	out << "Std. deviation in positions:  " << pow(x2,0.5) << " " << pow(y2,0.5) << " " << pow(z2,0.5) << endl; 
+
 	/*
 	out << "           DEBUG INFO" << endl;
 	out << " qi.size()= " << qi.size() << " qiAvg.size()= " << qiAvg.size() <<endl;

@@ -41,9 +41,14 @@ public:
 	void compute_ql(unsigned in_degree);
 	void compute_Sij(double S_min,string filename,string filename_cluster);
 
+	vector<double> get_center(double Qmin,double Qmax);
+	void center(double Qmin, double Qmax);
+
 	//void translate_all_particles(double dx,double dy,double dz);
 	//void load_xyz(ifstream& in);
-	bool  load_xyz(string ifilename,unsigned frame,double Lx,double Ly,double Lz,double neighbour_cutoff);
+	bool load_xyz(string ifilename,unsigned frame,double Lx,double Ly,double Lz,double neighbour_cutoff);
+	void wrap_into_box(double xO,double yO,double zO);
+
 	//void write_xyz(ostream& out);
 	void write_xyz(string ofilename,double Qmin, double Qmax);
 

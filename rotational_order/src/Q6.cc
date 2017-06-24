@@ -45,27 +45,32 @@ int main(int argc, char **argv) {
 	double Qmin=0.0;
 	double Qmax=1.0;
 	double Sij_min=-1.0;
+	bool center=false;
+	double xO=0.0,yO=0.0,zO=0.0;
+	bool change_origin = false;
 
 	// Handle command line options
 	vector<string> vecstr;
 	int c;
 	while(1) {
 		static struct option long_options[] = {
-				{"help",	no_argument, 0, 'h'},
-				{"quiet",	no_argument, 0, 'q'},
+				{"help",	no_argument      , 0, 'h'},
+				{"quiet",	no_argument      , 0, 'q'},
 				{"degree",	optional_argument, 0, 'l'},
 				{"input",	optional_argument, 0, 'i'},
 				{"frame",	optional_argument, 0, 'f'},
-				{"scan",	optional_argument, 0, 's'},
+				{"scan",	no_argument, 0, 's'},
 				{"Lengths",	optional_argument, 0, 'L'},
 				{"rcut",	optional_argument, 0, 'r'},
 				{"QminQmax",	optional_argument, 0, 'Q'},
 				{"Sij",		optional_argument, 0, 'S'},
 				{"output",	optional_argument, 0, 'o'},
+				{"origin", 	optional_argument, 0, 'O'},
+				{"centering",	no_argument      , 0, 'c'},
 				{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		c = getopt_long (argc, argv, "hql:i:f:sL:r:Q:S:o:",long_options,&option_index);
+		c = getopt_long (argc, argv, "hql:i:f:sL:r:Q:S:o:O:c",long_options,&option_index);
 		if(c==-1) break;
 		switch (c) {
 		/*case 0:
@@ -88,7 +93,7 @@ int main(int argc, char **argv) {
 			cout << " -h, --help                     Print information on using this program." << endl;
 			cout << " -q, --quiet                    Hide program output." << endl;
 			cout << " -l, --degree=INT   [6]         The degree of the bond rotational-order." << endl;
-			cout << " -r, --rcut=NUM     [1.4]       Neighbour cutoff distance." << endl;
+			cout << " -r, --rcut=NUM     [1.4]       Neighbour cut-off distance." << endl;
 			cout << " -i, --input=FILE   [traj.xyz]  Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
 			cout << " -f, --frame=INT    [0]         Frame of input file (0=first frame)." << endl;
 			cout << " -s, --scan                     Scan frames in file (only std output)." << endl; // TODO make output files for each frame
@@ -107,6 +112,9 @@ int main(int argc, char **argv) {
 			cout << "                                  The 7th column gives Lechner-Dellago bond-order. " << endl;
 			cout << "                                  The 8th column gives the number of Sij connections, " << endl;
 			cout << "                                  if the -S flag is used. " << endl;
+			cout << " -O, --origin=NUM,NUM,NUM       Set the position of the origin and wrap positions using periodic box." << endl;
+			cout << "                                  The remappings of positions are skipped by default." << endl;
+			cout << " -c, --centering                Shift the geometric center of selected particles to origin (no wrapping)." << endl;
 			exit(0);
 			break;
 		case 'q':
@@ -158,6 +166,21 @@ int main(int argc, char **argv) {
 		case 'o':
 			ofilename = optarg;
 			break;
+		case 'O':
+			change_origin = true;
+			vecstr = split(optarg,',');
+			if( vecstr.size()==3 ) {
+				xO = atof(vecstr.at(0).c_str());
+				yO = atof(vecstr.at(1).c_str());
+				zO = atof(vecstr.at(2).c_str());
+			} else {
+				cerr << "error: unknown input for -O, --origin\nTry -h or --help for more information." << endl;
+				abort();
+			}
+			break;
+		case 'c':
+			center=true;
+			break;
 		/*case '?':
 			break; */
 		default:
@@ -173,6 +196,8 @@ int main(int argc, char **argv) {
 	// Create object to compute rotational order
 	Rotational_order rot;
 	bool sucessfull_load = rot.load_xyz(ifilename,frame,Lx,Ly,Lz,neighbour_cutoff);
+	if(change_origin) rot.wrap_into_box(xO,yO,zO);
+
 	rot.compute_ql(degree);
 	if(!sucessfull_load){
 		cout << "error: Could not load frame " << frame << " in " << ifilename << endl;
@@ -187,6 +212,7 @@ int main(int argc, char **argv) {
 			}
 			frame++;
 			sucessfull_load = rot.load_xyz(ifilename,frame,Lx,Ly,Lz,neighbour_cutoff);
+			if(change_origin) rot.wrap_into_box(xO,yO,zO);
 			rot.compute_ql(degree);
 		}
 	} else {	// Run program on a single frame
@@ -196,6 +222,7 @@ int main(int argc, char **argv) {
 				cout << "Wrote Sij matrix to node_connections.dat and largest cluster of connected particles to largest_cluster.xyz." << endl;
 		}
 		if(ofilename!="none"){
+			if(center) rot.center(Qmin,Qmax);
 			rot.write_xyz(ofilename,Qmin,Qmax);
 			cout << "Wrote " << ofilename <<" with local bond-orderparamters of particles within Qmin and Qmax values." << endl;
 		}
