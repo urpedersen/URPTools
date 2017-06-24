@@ -23,9 +23,13 @@ This is a bunch of stand-alone (linux) tools that I during the years have made f
 git clone https://github.com/urpedersen/URPTools.git
 cd URPTools
 ```
-
+Later, the newest branch can be downloaded with
+```
+git pull
+```
 2. Move into a program directory and read about how to build and usage
 ```sh
 cd PROGRAM
 cat readme.md
 ```
+

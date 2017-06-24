@@ -27,6 +27,7 @@ Type
 for more infomation on using the program.
 ### Usage:
 ```
+
 Usage examples:
 ./bin/Q6 --input=input.xyz --Lenghts=15.0,15.0.30.0
 ./bin/Q6 -i bcc.xyz -L 15.0 -r 1.5 -l 4 -o Q4.xyz
@@ -35,7 +36,7 @@ Optional flags:     [default]
  -h, --help                     Print information on using this program.
  -q, --quiet                    Hide program output.
  -l, --degree=INT   [6]         The degree of the bond rotational-order.
- -r, --rcut=NUM     [1.4]       Neighbour cutoff distance.
+ -r, --rcut=NUM     [1.4]       Neighbour cut-off distance.
  -i, --input=FILE   [traj.xyz]  Input file (*.xyz, *.xyz.gz or *.atom).
  -f, --frame=INT    [0]         Frame of input file (0=first frame).
  -s, --scan                     Scan frames in file (only std output).
@@ -47,7 +48,6 @@ Optional flags:     [default]
                                   The default value of -1.0 skips computation.
                                   A sparse matrix is written to node_connections.dat and
                                   the largest cluster is written to largest_cluster.xyz.
-                                  The Lechner-Dellago vectors are used to compute Sij.
  -o, --output=FILE  [none]      Output file (*.xyz or *.xyz.gz).
                                   Default value does not produce an output file.
                                   The 5th column gives number of neighbours. 
@@ -55,7 +55,11 @@ Optional flags:     [default]
                                   The 7th column gives Lechner-Dellago bond-order. 
                                   The 8th column gives the number of Sij connections, 
                                   if the -S flag is used. 
+ -O, --origin=NUM,NUM,NUM       Set the position of the origin and wrap positions using periodic box.
+                                  The remappings of positions are skipped by default.
+ -c, --centering                Shift the geometric center of selected particles to origin (no wrapping).
 ```
+
 ### References
 * P. Steinhardt, D. Nelson, and M. Ronchetti, Phys. Rev. B 28, 784 (1983), https://doi.org/10.1103/PhysRevB.28.784
 * W. Lechner and C. Dellago, J. Chem. Phys. 129, 114707 (2008), http://dx.doi.org/10.1063/1.2977970
