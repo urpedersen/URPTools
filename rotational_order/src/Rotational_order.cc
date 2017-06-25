@@ -341,7 +341,7 @@ void Rotational_order::center(double Qmin,double Qmax){
 		// Wrap boundaries
 		
 	}
-	cout << "Translated particles taking  ( " << center.at(0) << " , " << center.at(1) << " , " << center.at(2) << ") to the origo."<< endl;
+	cout << "Translated particles taking  ( " << center.at(0) << " , " << center.at(1) << " , " << center.at(2) << " ) to the origo."<< endl;
 }
 
 
