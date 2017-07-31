@@ -682,5 +682,6 @@ string Rotational_order::info(double Qmin,double Qmax){
 	out << " number_of_neighbors.size()= " << number_of_neighbors.size() <<endl;
 	out << " number_of_S_connections.size()= " << number_of_S_connections.size() <<endl;
 	*/
+	
 	return out.str();
 }

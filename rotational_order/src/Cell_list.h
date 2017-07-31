@@ -20,6 +20,7 @@ private:
 	unsigned nx;
 	unsigned ny;
 	unsigned nz;
+	vector<vector<unsigned> > neighbor_list;
 	
 public: 
 	Cell_list();
@@ -35,6 +36,7 @@ public:
 		double r
 	);
 	void neighbors(unsigned particle_index, vector<unsigned>& out);
+	void neighbors27(unsigned particle_index, vector<unsigned>& out);
 	string info();
 };
 
