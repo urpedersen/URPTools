@@ -1,0 +1,378 @@
+#!/bin/bash -e
+
+ifile=start.xyz.gz
+frame=0
+povrayINI=myPovray.ini
+oname=start
+cameraAngle=-pi/8
+cameraHeight=0.66*Ly
+cameraDistance=2.0*Lx
+cameraLookAt=0,-0.15*Ly,0
+autoRender=true
+temporary=true
+width=800
+height=600
+autoBBox=true
+Lx=10
+Ly=10
+Lz=10
+
+#######################################
+# Handle commandline input
+while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
+  case $opt in
+	h)
+      echo ""
+	  echo "  Convert an xyz configuration to a image using POV-ray [www.povray.org]."
+      echo ""
+	  echo "Usage: $0 [-i start.xyz.gz] [-o start]"
+      echo ""
+      echo "  -h,         Print this help message."
+      echo "  -i FILE     Input configuration."
+      echo "                The default is start.xyz.gz."
+	  echo "  -B NUM,NUM,NUM"
+	  echo "              Set size of box Lx,Ly,Lz."
+      echo "              By default is is assumed that that the header of the xyz-file"
+      echo "                has the info like this sim_box=RectangularSimulationBox,10,10,10 "
+      echo "  -f INT      Frame index."
+	  echo "                The default is 0 (the first frame)."
+      echo "  -p FILE     Povray input header file."
+      echo "                A default file is generated if file does not exist."
+      echo "                The default is myPovray.ini."
+      echo "  -o STR      Output file name, i.e."
+      echo "                will generate STR.pov and STR.png."
+      echo "                STR=INPUT_NAME: name of the input configuration."
+      echo "  -a NUM      Camera angle position (radians)."
+      echo "                The default is -pi/8."
+      echo "  -y NUM      Camera height"
+      echo "                The default is 0.66*Ly"
+      echo "  -r NUM      Camera radial distance"
+      echo "                The default is 2.0*Lx"
+      echo "  -L NUM,NUM,NUM"
+      echo "              Camera look_at position"
+      echo "                The default is 0,-0.15*Ly,0"
+      echo "  -W INT,     Width of output image. Height is set to 3/4 of width."
+      echo "                The default is 800 (height of 600)."
+      echo "  -d,         Disable running povray (but do generate *.pov file)."
+	    echo ""
+      echo "Usage example:"
+      echo "  $0 -d -i start.xyz.gz -o start"
+      echo "  povray +P +W1600 +H1200 +A +HImyPovray.ini +Istart.pov"
+      echo ""
+      echo "Caveat: Default myPovray.ini file can only handle up to 16 particle types. "
+      echo ""
+      echo "Dependency: POV-ray [www.povray.org]."
+      echo ""
+	  exit 0
+	  ;;
+    d)
+      autoRender=false
+      ;;
+    f)
+      frame=$OPTARG
+      ;;
+    i)
+	  ifile=$OPTARG
+	  ;;
+    p)
+      povrayINI=$OPTARG
+      ;;
+    o)
+      temporary=false
+      if [ $OPTARG = "INPUT_NAME" ]; then
+        oname="${ifile%%.*}"
+      else
+        oname=$OPTARG
+      fi
+      ;;
+    a)
+      cameraAngle=$OPTARG
+      ;;
+    y)
+      cameraHeight=$OPTARG
+      ;;
+    r)
+      cameraDistance=$OPTARG
+      ;;
+    L)
+      cameraLookAt=$OPTARG
+      ;;
+    W)
+      width=$OPTARG
+      height=$(( $width * 3 / 4 ))
+      ;;
+	B)
+	  tmp=$OPTARG
+	  tmp=(${tmp//,/ })
+    if [ ${#tmp[@]} = 1 ];then
+	    Lx=${tmp[0]}
+	    Ly=$Lx
+	    Lz=$Lx
+    else
+	    Lx=${tmp[0]}
+	    Ly=${tmp[1]}
+	    Lz=${tmp[2]}
+    fi
+	  autoBBox=false
+	  echo Set BBox lengths to $Lx, $Ly and $Lz.
+	  ;;
+	\?)
+	  echo "error: Invalid option: -$OPTARG" >&2
+      exit 1
+	  ;;
+    :)
+	  echo "error: Option -$OPTARG requires an argument. Use -h for usage help." >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ ! -f $ifile ]; then
+  echo "error: Input file $ifile does not exist. Use -h for usage help." >&2
+  exit 1
+fi
+
+### See if file is zipped
+if [ "${file:6}" = "xyz.gz" ]; then
+  isZip=true
+  cat=zcat
+  echo The input file is zipped.
+else
+  isZip=false
+  cat=cat
+  echo The input file is NOT zipped.
+fi
+
+
+if [ $temporary = true ]; then
+  oname=$(mktemp /tmp/XXXXXXXXX)
+  ofile=$oname.pov
+else
+  ofile=$oname.pov
+fi
+
+if [ -f $ofile ]; then
+  echo "warning: The output file $ofile already exist."
+fi
+
+#######################################
+# Make input setting file if it does not exist
+# TODO: use number of types from xyz input
+if [ -f $povrayINI ]; then
+  echo Use the POV-ray header file $povrayINI. 
+else
+  echo "Auto-generate the POV-ray header file $povrayINI. "
+  echo '
+#include "colors.inc"
+#include "textures.inc"
+
+#declare addBox = true;
+#declare addFloor = false;
+#declare addWalls = false;
+#declare addSkySphere = false;
+#declare addUnitVectors = false;
+
+#declare BackgroundColor = Black;
+
+#declare Size0 = 0.5;
+#declare Size1 = 0.4;
+#declare Size2 = 0.5;
+#declare Size3 = 0.5;
+#declare Size4 = 0.5;
+#declare Size5 = 0.5;
+#declare Size6 = 0.5;
+#declare Size7 = 0.5;
+#declare Size8 = 0.5;
+#declare Size9 = 0.5;
+#declare Size10 = 0.5;
+#declare Size11 = 0.5;
+#declare Size12 = 0.5;
+#declare Size13 = 0.5;
+#declare Size14 = 0.5;
+#declare Size15 = 0.5;
+
+#declare Color0 = White;
+#declare Color1 = Red;
+#declare Color2 = Blue;
+#declare Color3 = Green;
+#declare Color4 = rgb<1,1,1>;
+#declare Color5 = rgb<1,1,1>;
+#declare Color6 = rgb<1,1,1>;
+#declare Color7 = rgb<1,1,1>;
+#declare Color8 = rgb<1,1,1>;
+#declare Color9 = rgb<1,1,1>;
+#declare Color10 = rgb<1,1,1>;
+#declare Color11 = rgb<1,1,1>;
+#declare Color12 = rgb<1,1,1>;
+#declare Color13 = rgb<1,1,1>;
+#declare Color14 = rgb<1,1,1>;
+#declare Color15 = rgb<1,1,1>;
+
+#declare FinishDefault = finish { ambient .1 diffuse .6 brilliance 1 crand 0 phong 0.2 };
+#declare Texture0 = texture { pigment { Color0 } finish { FinishDefault } };
+#declare Texture1 = texture { pigment { Color1 } finish { FinishDefault } };
+#declare Texture2 = texture { pigment { Color2 } finish { FinishDefault } };
+#declare Texture3 = texture { pigment { Color3 } finish { FinishDefault } };
+#declare Texture4 = texture { pigment { Color4 } finish { FinishDefault } };
+#declare Texture5 = texture { pigment { Color5 } finish { FinishDefault } };
+#declare Texture6 = texture { pigment { Color6 } finish { FinishDefault } };
+#declare Texture7 = texture { pigment { Color7 } finish { FinishDefault } };
+#declare Texture8 = texture { pigment { Color8 } finish { FinishDefault } };
+#declare Texture9 = texture { pigment { Color9 } finish { FinishDefault } };
+#declare Texture10 = texture { pigment { Color10 } finish { FinishDefault } };
+#declare Texture11 = texture { pigment { Color11 } finish { FinishDefault } };
+#declare Texture12 = texture { pigment { Color12 } finish { FinishDefault } };
+#declare Texture13 = texture { pigment { Color13 } finish { FinishDefault } };
+#declare Texture14 = texture { pigment { Color14 } finish { FinishDefault } };
+#declare Texture15 = texture { pigment { Color15 } finish { FinishDefault } };
+' > $povrayINI
+fi
+
+#######################################
+# Make povray file
+echo Generate povray scene $ofile of configuration in $ifile
+
+# Try to get box vectors # TODO make more roubust for different types of files
+if [ $autoBBox = true ]; then
+  echo "Note"
+  Lx=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF;n++){print $n}}' | awk -F"," '/sim_box/{print $2}'`;
+  Ly=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF;n++){print $n}}' | awk -F"," '/sim_box/{print $3}'`;
+  Lz=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF;n++){print $n}}' | awk -F"," '/sim_box/{print $4}'`;
+  if [ $Lx = "" ]; then Lx=10; fi
+  if [ $Ly = "" ]; then Ly=10; fi
+  if [ $Lz = "" ]; then Lz=10; fi
+fi
+
+
+echo '
+// Declarations of constants
+
+#declare Lx='$Lx';
+#declare Ly='$Ly';
+#declare Lz='$Lz';
+
+#declare cameraPositionAngle='$cameraAngle';
+#declare cameraHeight='$cameraHeight';
+#declare cameraDistance='$cameraDistance';
+#declare cameraLookAt=<'$cameraLookAt'>;
+
+// Camera and background
+camera { 
+  perspective 
+  location < cameraDistance*cos(cameraPositionAngle), cameraHeight , cameraDistance*sin(cameraPositionAngle) > 
+  look_at  cameraLookAt 
+  angle 55
+}
+background { color BackgroundColor }
+
+// Four-point light and Sun
+light_source { <  1.5*Lx,  0.6*Ly,  0      > color rgb< 1.00 , 1.00 , 1.00 > }
+light_source { <  1.0*Lx,  0.6*Ly,  1.0*Lz > color rgb< 0.95 , 0.95 , 0.95 > }
+light_source { < -1.0*Lx,  0.7*Ly,  0.2*Lz > color rgb< 0.95 , 0.95 , 0.95 > }
+light_source { < -1.0*Lx,  0.7*Ly, -1.0*Lz > color rgb< 0.95 , 0.95 , 0.95 > }
+light_source { <  -0.2*Lx, 1.5*Ly, -0.2*Lz > color rgb< 1.00 , 1.00 , 1.00 > }
+
+// Draw carthesian coordinate unit vector arrows at origin
+#if(addUnitVectors)
+  sphere   { < 0 , 0 , 0 > , 0.2 texture { pigment { color rgb< 0.3 , 0.3 , 0.3 > } } }
+  cone     { < 0.8 , 0.0 , 0.0 > , 0.25 , < 1.0 , 0.0 , 0.0 > , 0.0 texture { pigment { color rgb< 1.0 , 0.0 , 0.0 > } } }
+  cone     { < 0.0 , 0.8 , 0.0 > , 0.25 , < 0.0 , 1.0 , 0.0 > , 0.0 texture { pigment { color rgb< 0.0 , 1.0 , 0.0 > } } }
+  cone     { < 0.0 , 0.0 , 0.8 > , 0.25 , < 0.0 , 0.0 , 1.0 > , 0.0 texture { pigment { color rgb< 0.0 , 0.0 , 1.0 > } } }
+  cylinder { < 0 , 0 , 0 > , < 0.9 , 0.0 , 0.0 > , 0.1 open texture { pigment { color rgb< 1.0 , 0.0 , 0.0 > } } }
+  cylinder { < 0 , 0 , 0 > , < 0.0 , 0.9 , 0.0 > , 0.1 open texture { pigment { color rgb< 0.0 , 1.0 , 0.0 > } } }
+  cylinder { < 0 , 0 , 0 > , < 0.0 , 0.0 , 0.9 > , 0.1 open texture { pigment { color rgb< 0.0 , 0.0 , 1.0 > } } }
+#end
+
+// Add periodic box with cell boundaries
+#if(addBox)
+  sphere { < -0.5*Lx , -0.5*Ly , -0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  sphere { <  0.5*Lx , -0.5*Ly , -0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  sphere { < -0.5*Lx ,  0.5*Ly , -0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  sphere { <  0.5*Lx ,  0.5*Ly , -0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  sphere { < -0.5*Lx , -0.5*Ly ,  0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  sphere { <  0.5*Lx , -0.5*Ly ,  0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  sphere { < -0.5*Lx ,  0.5*Ly ,  0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  sphere { <  0.5*Lx ,  0.5*Ly ,  0.5*Lz > , 0.4 texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } } 
+  cylinder { < -0.5*Lx , -0.5*Ly , -0.5*Lz > , < 0.5*Lx , -0.5*Ly , -0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { <  0.5*Lx , -0.5*Ly , -0.5*Lz > , < 0.5*Lx , 0.5*Ly , -0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { <  0.5*Lx , 0.5*Ly , -0.5*Lz > , < -0.5*Lx , 0.5*Ly , -0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { < -0.5*Lx , 0.5*Ly , -0.5*Lz > , < -0.5*Lx , -0.5*Ly , -0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { < -0.5*Lx , -0.5*Ly , 0.5*Lz > , < 0.5*Lx , -0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { <  0.5*Lx , -0.5*Ly , 0.5*Lz > , < 0.5*Lx , 0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { <  0.5*Lx , 0.5*Ly , 0.5*Lz > , < -0.5*Lx , 0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { < -0.5*Lx , 0.5*Ly , 0.5*Lz > , < -0.5*Lx , -0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { < -0.5*Lx , -0.5*Ly , -0.5*Lz > , < -0.5*Lx , -0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { <  0.5*Lx , -0.5*Ly , -0.5*Lz > , < 0.5*Lx , -0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { < -0.5*Lx ,  0.5*Ly , -0.5*Lz > , < -0.5*Lx , 0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+  cylinder { <  0.5*Lx ,  0.5*Ly , -0.5*Lz > , < 0.5*Lx , 0.5*Ly , 0.5*Lz > , 0.4 open texture { pigment { color rgb< 0.0 , 0.0 , 0.8 > } } }
+#end
+
+// Add floor
+#if(addFloor)
+  plane { y, -0.5*Ly-0.4001 pigment { color rgb<1,1,1> } }
+#end
+
+#if(addWalls)
+  plane { x,  2*Lx pigment { color rgb<1,1,1> } }
+  plane { x, -2*Lx pigment { color rgb<1,1,1> } }
+  plane { z,  2*Lz pigment { color rgb<1,1,1> } }
+  plane { z, -2*Lz pigment { color rgb<1,1,1> } }
+#end
+
+// Add sky sphere
+#if(addSkySphere)
+ sky_sphere {
+   pigment {
+   gradient y
+    color_map {
+    [ 0.5  color CornflowerBlue ]
+	[ 1.0  color MidnightBlue ]
+   }
+   scale 2
+   translate -1
+   }
+ }
+#end
+
+// Particles
+' > $ofile
+
+$cat $ifile | awk 'BEGIN{
+  getline
+  N=$1
+  getline
+  f=0
+  while(f < '$frame' + 1) {
+    for(n=0;n<N;n++) {
+      getline
+      if(f == '$frame'){
+        printf "sphere {<%f,%f,%f>,Size%d texture { Texture%d } }\n",$2,$3,$4,$1,$1
+      }
+    }
+    getline
+    N=$1
+    getline
+    f++
+  }
+}' >> $ofile
+
+
+#######################################
+# Render image by calling POV-ray
+if [ $autoRender = true ]; then
+  echo "Generate image with:"
+  povray +P +HI$povrayINI +H$height +W$width +A +I$ofile
+else
+  echo "Wrote POV-ray file" $ofile 
+fi
+
+
+#######################################
+# Clean-up 
+if [ $temporary = true ]; then
+  rm $oname
+  rm $oname.pov
+  rm $oname.png
+fi
+
+exit 0

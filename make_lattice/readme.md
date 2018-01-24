@@ -22,5 +22,3 @@ Type
 ```
 for information on using the program.
 
-## Tools
-The directory Tools contains two script that converts xyz-files to the [Gromacs format](http://manual.gromacs.org/current/online/gro.html)
