@@ -133,12 +133,10 @@ if [ ! -f $ifile ]; then
 fi
 
 ### See if file is zipped
-if [ "${file:6}" = "xyz.gz" ]; then
-  isZip=true
+if [ "${file:6}"="xyz.gz" ]; then
   cat=zcat
   echo The input file is zipped.
 else
-  isZip=false
   cat=cat
   echo The input file is NOT zipped.
 fi
