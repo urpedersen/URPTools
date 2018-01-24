@@ -234,13 +234,9 @@ echo Generate povray scene $ofile of configuration in $ifile
 
 # Try to get box vectors # TODO make more roubust for different types of files
 if [ $autoBBox = true ]; then
-  echo "Note"
-  Lx=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF;n++){print $n}}' | awk -F"," '/sim_box/{print $2}'`;
-  Ly=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF;n++){print $n}}' | awk -F"," '/sim_box/{print $3}'`;
-  Lz=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF;n++){print $n}}' | awk -F"," '/sim_box/{print $4}'`;
-  if [ $Lx = "" ]; then Lx=10; fi
-  if [ $Ly = "" ]; then Ly=10; fi
-  if [ $Lz = "" ]; then Lz=10; fi
+  Lx=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF+1;n++){print $n}}' | awk -F"," '/sim_box/{print $2}'`;
+  Ly=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF+1;n++){print $n}}' | awk -F"," '/sim_box/{print $3}'`;
+  Lz=`$cat $ifile | head -n 2 | tail -n 1 | awk '{for(n=1;n<NF+1;n++){print $n}}' | awk -F"," '/sim_box/{print $4}'`;
 fi
 
 
