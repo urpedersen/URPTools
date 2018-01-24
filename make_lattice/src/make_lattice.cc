@@ -1,5 +1,4 @@
 //============================================================================
-// Name        : generateLattice.cc
 // Author      : Ulf R. Pedersen
 // Build       : g++ -O3 lattice.h lattice.cc make_lattice.cc -lboost_iostreams -o make_lattice
 //============================================================================
@@ -75,9 +74,9 @@ int main(int argc, char **argv) {
 			printf ("\n");
 			break;*/
 		case 'h':
-			//cout << endl;
-			cout << "Make a crystal lattice configuration." << endl << endl;
-			// cout << "Usage: " << argv[0] << " [--lattice=STR] [--cells=INT,INT,INT] " << endl;
+			cout << endl;
+			cout << "    This program generate a crystal lattice configuration" << endl;
+			cout << "      by Ulf R. Pedersen (http://urp.dk/tools)."<< endl << endl;
 			cout << "Usage examples:" << endl;
 			cout << argv[0] << " --lattice=fcc --cells=6,6,6" << endl;
 			cout << argv[0] << " -lfcc -c6,6,6" << endl;
@@ -109,7 +108,8 @@ int main(int argc, char **argv) {
 			cout << " -d, --minimum_distance=NUM    Do not allow distances shorter than min_dist. Warning: Slow for large systems." << endl;
 			cout << " -T, --temperature=NUM         Temperature of random velocity vectors." << endl;
 			cout << " -s, --seed=INT                Seed for pseudo random numbers." << endl;
-			cout << " -o, --output=FILE             *.xyz or *.xyz.gz output file." << endl << endl;
+			cout << " -o, --output=FILE             *.xyz or *.xyz.gz or data.*.gz " << endl;
+			cout << "                                 The latter is a data file for LAMMPS (http://lammps.sandia.gov)."<< endl;
 			exit(0);
 			break;
 		case 'q':
@@ -230,19 +230,26 @@ int main(int argc, char **argv) {
 		vector<string> fnames = split(filename,'.');
 		filtering_ostream out;
 		if(fnames.size()<2){
-			cerr << "error: Incompatible name of output file. Should be *.xyz or *.xyz.gz" << endl;
+			cerr << "error: Incompatible name of output file. Should be *.xyz, *.xyz.gz or data.*.gz (lammps data file)" << endl;
 			abort();
 		}
 		if(fnames.back()=="xyz"){
 			out.push(file_sink(filename));
+			lattice.write_xyz(out,temperature);
 		} else if ( fnames.back()=="gz" && fnames.at(fnames.size()-2)=="xyz" )  {
 			out.push(gzip_compressor());
 			out.push(file_sink(filename));
-		} else {
+			lattice.write_xyz(out,temperature);
+		} else if (fnames.back()=="gz" && fnames.front()=="data"){
+			out.push(gzip_compressor());
+			out.push(file_sink(filename));
+			lattice.write_lammps(out,temperature);
+		}
+		else {
 			cerr << "error: Incompatible name of output file. Should be *.xyz or *.xyz.gz" << endl;
 			abort();
 		}
-		lattice.write_xyz(out,temperature);
+
 	}
 	if(!quiet)
 		cout << "Write configuration to " << filename  << " with temperature " << temperature << endl;

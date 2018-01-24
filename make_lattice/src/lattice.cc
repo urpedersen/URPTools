@@ -551,6 +551,32 @@ void Lattice::write_xyz(ostream& out,double temperature){
 }
 
 /**
+ * Write coordinates of particles to a lammps data file
+ */
+void Lattice::write_lammps(ostream& out,double temperature){
+  //stringstream out;
+  out << "LAMMPS data file via make_lattice (http://urp.dk/tools)" << endl << endl;
+  out << this->number_of_particles()<<" atoms"<<endl;
+  out << this->number_of_types()<<" atom types"<<endl<<endl;
+  out << setprecision(16);
+  out << -0.5*Lx << " " << 0.5*Lx << " xlo xhi" << endl;
+  out << -0.5*Ly << " " << 0.5*Ly << " ylo yhi" << endl;
+  out << -0.5*Lz << " " << 0.5*Lz << " zlo zhi" << endl << endl;
+  out << "Masses" << endl << endl;
+  for(unsigned i=0;i<mass_of_types.size();i++)
+   	out << i+1 << " " << mass_of_types.at(i) << endl;
+  out << endl << "Atoms # atomic" << endl << endl;
+  for (unsigned i=0;i<number_of_particles();i++)
+	out << i+1 << " " << type.at(i)+1 << " " << x.at(i) << " " << y.at(i) << " " << z.at(i) << " 0 0 0" << endl;
+  out << endl << "Velocities" << endl << endl;
+  for (unsigned i=0;i<number_of_particles();i++)
+	out << i+1 << " " 
+	  << random_velocity(temperature,mass_of_types.at(type.at(i))) << " " 
+	  << random_velocity(temperature,mass_of_types.at(type.at(i))) << " " 
+	  << random_velocity(temperature,mass_of_types.at(type.at(i))) << endl ;
+}
+
+/**
  * Return a string with various information about the lattice
  */
 string Lattice::info(){

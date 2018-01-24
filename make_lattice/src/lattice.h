@@ -46,6 +46,7 @@ public:
 	bool reset_particle_type(unsigned particle_index,unsigned new_type);
 	void reset_number_of_particles(unsigned num_remove);
 	void write_xyz(ostream& out,double temperature);
+	void write_lammps(ostream& out,double temperature);
 
 	unsigned number_of_particles();
 	unsigned number_of_types();
