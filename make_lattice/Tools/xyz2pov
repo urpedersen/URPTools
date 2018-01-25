@@ -32,7 +32,7 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
       echo ""
       echo "  -h,         Print this help message."
       echo "  -i FILE     Input configuration."
-      echo "                The default is start.xyz.gz."
+      echo "                The default is start.xyz.gz (can also read *.xyz files)."
       echo "  -B NUM,NUM,NUM"
       echo "              Set the size of box: Lx,Ly,Lz."
       echo "              By default it is assumed that that the header of the xyz-file"
@@ -46,7 +46,7 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
       echo "                Will generate STR.pov and STR.png."
       echo "                STR=INPUT_NAME gives name of the input configuration."
       echo "  -a NUM      Camera angle position (radians)."
-      echo "                The default is -pi/8."
+      echo "                The default is -pi/8"
       echo "  -y NUM      Camera height"
       echo "                The default is 0.66*Ly"
       echo "  -r NUM      Camera radial distance"
@@ -66,8 +66,8 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
       echo ""
       echo "Dependency: POV-ray [www.povray.org]."
       echo ""
-	  exit 0
-	  ;;
+      exit 0
+      ;;
     d)
       autoRender=false
       ;;
