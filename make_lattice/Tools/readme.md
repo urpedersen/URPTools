@@ -68,14 +68,14 @@ the value `clock` (that will vary from 0-1 during the movie).
 1. Generate an example configuration (`start.xyz.gz`)
 
 ```
-  make_lattice
+make_lattice
 ```
 
 2. Generate a POV-ray scene where the angular position of the camera
    is set using the `clock` value that will range from 0-1.
 
 ```
-  xyz2pov -d -a 2*pi*clock -o scene  `
+xyz2pov -d -a 2*pi*clock -o scene  `
 ```
 
 3. Generate 100 images for the movie using [POV-ray](http://www.povray.org/). 
@@ -83,25 +83,25 @@ the value `clock` (that will vary from 0-1 during the movie).
    `+W400 +H300` set the pixel size, and `+KC` that the movie can be looped.
 
 ```
-    povray -D +W400 +H300 +HImyPovray.ini +Iscene.pov +KFF100 +KC +Oframe.png
+povray -D +W400 +H300 +HImyPovray.ini +Iscene.pov +KFF100 +KC +Oframe.png
 ```
 
 4. Use [ffmpeg](https://www.ffmpeg.org/) to generate a movie from images
 
 ```
-    ffmpeg -i frame%03d.png movie.mp4 
+ffmpeg -i frame%03d.png movie.mp4 
 ```
 
 5. Clean up by deleting images
 
 ```
-    rm frame???.png
+rm frame???.png
 ```
 
 6. View movie, quit by pressing `q` (the `-loop 0` option makes the movie loop indefinitely)
 
 ```
-    ffplay -loop 0 movie.mp4
+ffplay -loop 0 movie.mp4
 ```
 
 Hint: You can edit `myPovray.ini` and `scene.pov` between step 2 and 3 to modify the scene.
