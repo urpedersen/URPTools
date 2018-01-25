@@ -138,7 +138,7 @@ if [ ! -f $ifile ]; then
 fi
 
 ### See if file is zipped
-if [ "${file:6}"="xyz.gz" ]; then
+if [[ $file == *.xyz.gz ]]; then
   cat=zcat
   echo The input file is zipped.
 else
