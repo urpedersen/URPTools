@@ -1,4 +1,6 @@
 #!/bin/bash -e
+# Bash script by Ulf R. Pedersen (http://urp.dk) for converting a xyz configuration to a POV-ray rendered image.
+#   This script is a part of URPTools: http://urp.dk/tools
 
 ifile=start.xyz.gz
 frame=0
@@ -23,25 +25,26 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
   case $opt in
 	h)
       echo ""
-	  echo "  Convert an xyz configuration to a image using POV-ray [www.povray.org]."
+      echo "  Convert an xyz configuration to a image using POV-ray [www.povray.org]."
+      echo "    by Ulf R. Pedersen (http)
       echo ""
-	  echo "Usage: $0 [-i start.xyz.gz] [-o start]"
+      echo "Usage: $0 [-i start.xyz.gz] [-o start]"
       echo ""
       echo "  -h,         Print this help message."
       echo "  -i FILE     Input configuration."
       echo "                The default is start.xyz.gz."
-	  echo "  -B NUM,NUM,NUM"
-	  echo "              Set size of box Lx,Ly,Lz."
-      echo "              By default is is assumed that that the header of the xyz-file"
-      echo "                has the info like this sim_box=RectangularSimulationBox,10,10,10 "
+      echo "  -B NUM,NUM,NUM"
+      echo "              Set the size of box: Lx,Ly,Lz."
+      echo "              By default it is assumed that that the header of the xyz-file"
+      echo "                has the info like this: sim_box=RectangularSimulationBox,10,10,10"
       echo "  -f INT      Frame index."
-	  echo "                The default is 0 (the first frame)."
+      echo "                The default is 0 (the first frame)."
       echo "  -p FILE     Povray input header file."
-      echo "                A default file is generated if file does not exist."
       echo "                The default is myPovray.ini."
-      echo "  -o STR      Output file name, i.e."
-      echo "                will generate STR.pov and STR.png."
-      echo "                STR=INPUT_NAME: name of the input configuration."
+      echo "                A default file is generated if the file does not exist."
+      echo "  -o STR      Output file name."
+      echo "                Will generate STR.pov and STR.png."
+      echo "                STR=INPUT_NAME gives name of the input configuration."
       echo "  -a NUM      Camera angle position (radians)."
       echo "                The default is -pi/8."
       echo "  -y NUM      Camera height"
@@ -54,7 +57,7 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
       echo "  -W INT,     Width of output image. Height is set to 3/4 of width."
       echo "                The default is 800 (height of 600)."
       echo "  -d,         Disable running povray (but do generate *.pov file)."
-	    echo ""
+      echo ""
       echo "Usage example:"
       echo "  $0 -d -i start.xyz.gz -o start"
       echo "  povray +P +W1600 +H1200 +A +HImyPovray.ini +Istart.pov"
@@ -72,8 +75,8 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
       frame=$OPTARG
       ;;
     i)
-	  ifile=$OPTARG
-	  ;;
+       ifile=$OPTARG
+      ;;
     p)
       povrayINI=$OPTARG
       ;;
@@ -101,32 +104,33 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
       width=$OPTARG
       height=$(( $width * 3 / 4 ))
       ;;
-	B)
-	  tmp=$OPTARG
-	  tmp=(${tmp//,/ })
-    if [ ${#tmp[@]} = 1 ];then
-	    Lx=${tmp[0]}
-	    Ly=$Lx
-	    Lz=$Lx
-    else
-	    Lx=${tmp[0]}
-	    Ly=${tmp[1]}
-	    Lz=${tmp[2]}
-    fi
-	  autoBBox=false
-	  echo Set BBox lengths to $Lx, $Ly and $Lz.
-	  ;;
-	\?)
-	  echo "error: Invalid option: -$OPTARG" >&2
-      exit 1
-	  ;;
+    B)
+      tmp=$OPTARG
+      tmp=(${tmp//,/ })
+      if [ ${#tmp[@]} = 1 ];then
+        Lx=${tmp[0]}
+        Ly=$Lx
+        Lz=$Lx
+      else
+        Lx=${tmp[0]}
+        Ly=${tmp[1]}
+        Lz=${tmp[2]}
+      fi
+      autoBBox=false
+      echo Set BBox lengths to $Lx, $Ly and $Lz.
+      ;;
+      \?)
+        echo "error: Invalid option: -$OPTARG" >&2
+        exit 1
+      ;;
     :)
-	  echo "error: Option -$OPTARG requires an argument. Use -h for usage help." >&2
+      echo "error: Option -$OPTARG requires an argument. Use -h for usage help." >&2
       exit 1
       ;;
   esac
 done
 
+### Confirm that input file exist
 if [ ! -f $ifile ]; then
   echo "error: Input file $ifile does not exist. Use -h for usage help." >&2
   exit 1
@@ -141,7 +145,7 @@ else
   echo The input file is NOT zipped.
 fi
 
-
+### Generate output POV-ray file
 if [ $temporary = true ]; then
   oname=$(mktemp /tmp/XXXXXXXXX)
   ofile=$oname.pov
