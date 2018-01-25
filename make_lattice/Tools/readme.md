@@ -15,27 +15,29 @@ A bash script that make an image of a xyz-file using [POV-ray](www.povray.org).
 The below information is given with the `-h` switch. 
 
 ```
-  Convert an xyz configuration to a image using POV-ray [www.povray.org].
 
-Usage: xyz2pov [-i start.xyz.gz] [-o start]
+  Convert an xyz configuration to a image using POV-ray [www.povray.org].
+    by Ulf R. Pedersen (http://urp.dk)
+
+Usage: ./Tools/xyz2pov [-i start.xyz.gz] [-o start]
 
   -h,         Print this help message.
   -i FILE     Input configuration.
-                The default is start.xyz.gz.
+                The default is start.xyz.gz. Also accept *.xyz files.
   -B NUM,NUM,NUM
-              Set size of box Lx,Ly,Lz.
-              By default is is assumed that that the header of the xyz-file
-                has the info like this sim_box=RectangularSimulationBox,10,10,10 
+              Set the size of box: Lx,Ly,Lz.
+              By default it is assumed that that the header of the xyz-file
+                has the info like this: sim_box=RectangularSimulationBox,10,10,10
   -f INT      Frame index.
                 The default is 0 (the first frame).
   -p FILE     Povray input header file.
-                A default file is generated if file does not exist.
                 The default is myPovray.ini.
-  -o STR      Output file name, i.e.
-                will generate STR.pov and STR.png.
-                STR=INPUT_NAME: name of the input configuration.
+                A default file is generated if the file does not exist.
+  -o STR      Output file name.
+                Will generate STR.pov and STR.png.
+                STR=INPUT_NAME gives name of the input configuration.
   -a NUM      Camera angle position (radians).
-                The default is -pi/8.
+                The default is -pi/8
   -y NUM      Camera height
                 The default is 0.66*Ly
   -r NUM      Camera radial distance
@@ -48,7 +50,7 @@ Usage: xyz2pov [-i start.xyz.gz] [-o start]
   -d,         Disable running povray (but do generate *.pov file).
 
 Usage example:
-  ./xyz2pov -d -i start.xyz.gz -o start
+  ./Tools/xyz2pov -d -i start.xyz.gz -o start
   povray +P +W1600 +H1200 +A +HImyPovray.ini +Istart.pov
 
 Caveat: Default myPovray.ini file can only handle up to 16 particle types. 
