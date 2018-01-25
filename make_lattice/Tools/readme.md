@@ -61,9 +61,9 @@ Dependency: POV-ray [www.povray.org].
 ### How to generate movie of a configuration
 
 A movie of a configuration can be generated using [ffmpeg](http://www.ffmpeg.org/)
-together with `rumd_image` and [POV-ray](http://www.povray.org/). Generate a POV-ray
-scene where the position of the camera is given by the value `clock` that will vary 
-from 0-1 during the movie.
+together with the `xyz2pov` script and [POV-ray](http://www.povray.org/). 
+We will generate a POV-ray scene where the position of the camera is given by 
+the value `clock` (that will vary from 0-1 during the movie).
 
 1. Generate an example configuration (`start.xyz.gz`)
 
