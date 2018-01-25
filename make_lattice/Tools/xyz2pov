@@ -26,7 +26,7 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
 	  h)
       echo ""
       echo "  Convert an xyz configuration to a image using POV-ray [www.povray.org]."
-      echo "    by Ulf R. Pedersen (http)
+      echo "    by Ulf R. Pedersen (http)"
       echo ""
       echo "Usage: $0 [-i start.xyz.gz] [-o start]"
       echo ""
