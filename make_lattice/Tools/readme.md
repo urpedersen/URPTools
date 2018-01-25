@@ -1,8 +1,7 @@
 This folder contains the tools
-
-   xyz2gro
-   gro2xyz
-   xyz2pov
+  * xyz2gro
+  * gro2xyz
+  * xyz2pov
 
 xyz2gro and gro2xyz
 ===========================
