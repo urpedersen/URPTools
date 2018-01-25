@@ -37,6 +37,7 @@ while getopts "hdf:i:p:o:B:W:a:y:r:L:" opt; do
       echo "              Set the size of box: Lx,Ly,Lz."
       echo "              By default it is assumed that that the header of the xyz-file"
       echo "                has the info like this: sim_box=RectangularSimulationBox,10,10,10"
+      echo "  -B NUM      Set size of cubic box: Lx=Ly=Lz=NUM"
       echo "  -f INT      Frame index."
       echo "                The default is 0 (the first frame)."
       echo "  -p FILE     Povray input header file."
