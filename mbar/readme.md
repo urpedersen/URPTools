@@ -32,7 +32,7 @@ The log of the reweighted distribution function is in log_probability.dat.
 Usage example:
 ```
 make
-cd Examples
+cd examples
 ../bin/mbar --verbose=10 | tee mbar.log
 xmgrace log_probability.dat.
 ```
