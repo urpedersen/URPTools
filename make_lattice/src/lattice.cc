@@ -20,6 +20,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
 
+#include "randomGaussian.h"    // Generate a random number from a gauss distribution
 #include "split.h"    // Split a string into a vector<string>
 
 using namespace std;
@@ -307,9 +308,9 @@ Lattice::~Lattice() {
  * Return random component to velocity vector TODO See if this is the right distribution
  */
 double Lattice::random_velocity(double temperature,double mass){
-	double tmp = 0.0;
-	for(unsigned i=0;i<12;i++) tmp+=((double)rand()/(double)RAND_MAX-0.5); // Normal distribution with sigma=1
-	return tmp*sqrt(temperature/mass);
+	double r = randomGaussian();
+    //for(unsigned i=0;i<12;i++) tmp+=((double)rand()/(double)RAND_MAX-0.5); // Normal distribution with sigma=1
+	return r*sqrt(temperature/mass);
 }
 
 /**

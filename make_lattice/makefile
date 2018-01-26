@@ -5,7 +5,7 @@ CPPFLAGS =
 LIBS = -lboost_iostreams
 
 SRCDIR = src
-SRCS = $(SRCDIR)/make_lattice.cc $(SRCDIR)/lattice.cc $(SRCDIR)/split.cc 
+SRCS = $(SRCDIR)/make_lattice.cc $(SRCDIR)/lattice.cc $(SRCDIR)/split.cc $(SRCDIR)/randomGaussian.cc 
 OBJS = $(SRCS:.cc=.o)
 MAINDIR = bin
 MAIN = $(MAINDIR)/make_lattice
