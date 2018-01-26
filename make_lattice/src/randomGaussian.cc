@@ -11,10 +11,10 @@ double randomGaussian() {
   do {
     u = 2.0*(double)rand()/(double)RAND_MAX-1.0;
     v = 2.0*(double)rand()/(double)RAND_MAX-1.0;
-	s = u*u + v*v;
+    s = u*u + v*v;
   } while( s >= 1.0 || s == 0.0 );
   return u*sqrt(-2.0*log(s)/s);  
-  // Note another random number is avalible in v*sqrt(-2.0*log(s)/s)
+  // Note: an other random number is avalible, v*sqrt(-2.0*log(s)/s)
   
   // Below is an implimentation using a sum of 12 random numbers
   //double out = 0.0;
