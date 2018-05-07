@@ -37,12 +37,12 @@ public:
 	
 	void clear();  /// Clear memory for a new computation
 	
-	void addParticle(unsigned in_type,double in_x,double in_y,double in_z);
+	void add_particle(unsigned in_type,double in_x,double in_y,double in_z);
+	void set_neighbour_cutoff(double in_neighbour_cutoff);
 
   void generate_ideal_gas_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz);
   bool load_xyz(string ifilename);
 	bool load_xyz(string ifilename,unsigned frame,double Lx,double Ly,double Lz);
-	void build_neighbour_list();
 	void wrap_into_box(double xO,double yO,double zO);
 	void write_xyz();
 	void write_xyz(string ofilename);
@@ -53,6 +53,9 @@ public:
 	double volume();
 
 	void monte_carlo(unsigned steps,double stepSize,unsigned frames);
+
+	bool is_overlapping(unsigned p);
+	bool is_overlapping();
 
 	string info();
 };

@@ -24,8 +24,8 @@ int main(int argc, char **argv) {
 	// Set default values
 	bool quiet=false;
 	string ifilename = "none";
-	double Lx=10,Ly=10,Lz=10;
-	double neighbour_cutoff=1.8;
+	double Lx=16,Ly=16,Lz=16;
+	double neighbour_cutoff=1.5;
 	string ofilename = "traj.xyz";
 
 	// Handle command line options
@@ -105,10 +105,11 @@ int main(int argc, char **argv) {
 
 	// Create object to compute rotational order
 	HSSim sim;
+	sim.set_neighbour_cutoff(neighbour_cutoff);
 	int load_frame = 0;
 	if(ifilename=="none")
 	{
-    	sim.generate_ideal_gas_positions(100,Lx,Ly,Lz);
+    	sim.generate_ideal_gas_positions(1000,Lx,Ly,Lz);
 	  	cout << sim.info() << endl;
 	} else {
 		bool sucessfull_load = sim.load_xyz(ifilename,load_frame,Lx,Ly,Lz);
@@ -119,10 +120,12 @@ int main(int argc, char **argv) {
 		}
 	}
 	
-	// TODO set neighbour cut off
+	// Make MC steps
+	sim.monte_carlo(50,0.1,250);
 
-	sim.monte_carlo(100,0.1,20);
+	// Write info to user
 	sim.write_xyz("final.xyz");
+	cout << sim.info() << endl;
 
 	return 0;
 }

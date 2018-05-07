@@ -73,11 +73,16 @@ void HSSim::clear() {
 /**
  * Add a particle of in_type to the lattice
  */
-void HSSim::addParticle(unsigned in_type,double in_x,double in_y,double in_z){
+void HSSim::add_particle(unsigned in_type,double in_x,double in_y,double in_z){
 	type.push_back(in_type);
 	x.push_back(in_x);
 	y.push_back(in_y);
 	z.push_back(in_z);
+}
+	
+
+void HSSim::set_neighbour_cutoff(double in_neighbour_cutoff){
+  neighbour_cutoff = in_neighbour_cutoff;
 }
 
 
@@ -135,11 +140,10 @@ void HSSim::generate_ideal_gas_positions(unsigned num_particles,double in_Lx,dou
 	  float random_x = dice(gen)*Lx;
 	  float random_y = dice(gen)*Ly;
 	  float random_z = dice(gen)*Lz;
-	  type.push_back(0);
-	  x.push_back(random_x);
-	  y.push_back(random_y);
-	  z.push_back(random_z);
+	  add_particle(0,random_x,random_y,random_z);
 	}	
+	
+	cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);	
 }
 
 /**
@@ -315,16 +319,10 @@ bool HSSim::load_xyz(string ifilename,unsigned frame,double in_Lx,double in_Ly,d
 		cerr << "error: Unknown input file format. filename = " <<  ifilename;
 	}
 
-	build_neighbour_list();
+	cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);	
 
 	//cout << "Done reading " << ifilename << " Lx = " << Lx << " Ly = " << Ly << " Lz = " << Lz <<  " num_atoms = " << x.size() << endl;
 	return sucessfull_load_of_frame;
-}
-
-/// Builds the neigbour lsut
-void HSSim::build_neighbour_list(){
-	cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);	
-	//cout << cell_list.info();
 }
 
 void HSSim::wrap_into_box(double xO,double yO,double zO){
@@ -382,36 +380,104 @@ void HSSim::write_xyz(string ofilename){
 /**
   Run a monte_carlo (MC) simulation
 */
-void HSSim::monte_carlo(unsigned steps,double stepSize,unsigned frames){
+void HSSim::monte_carlo(unsigned steps,double step_size,unsigned frames){
+	boost::random::uniform_real_distribution<> dice_m1to1( -1.0 , 1.0 );
 	boost::random::uniform_real_distribution<> dice_0to1( 0.0 , 1.0 );
 	boost::random::uniform_int_distribution<> dice_particle( 0 , number_of_particles()-1 );
-	for(unsigned f=0;f<frames;f++){
+	cout << "  Perform " << frames << " frames of " << steps << " MC steps" 
+	  << ", stepsize = " << step_size << endl;
+
+	unsigned rejected = 0;
+	unsigned attempts = 0;
+
+	for(unsigned frame=0;frame<frames;frame++){
+	  if      (frame%50==0 ) cout << endl << frame << "\t|";
+	  else if (frame%10==0) cout << "|";
+	  else if (frame%5==0) cout << ":";
+	  else if (frame%50==49) cout << ".|";
+	  else cout << ".";
+	  cout << flush;
+
+
 	  wrap_into_box(0,0,0);
 	  write_xyz("traj.xyz");
-		for(unsigned s=0;s<steps*number_of_particles();s++){
-	  	// Pick a random particle
+
+	  for(unsigned s=0;s<steps*number_of_particles();s++){
+		// TODO only build neighbour list when nessesary, and safely!
+		if(s%number_of_particles()*5==0)
+	    	cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);	
+		
+		// Pick a random particle
       	unsigned p = dice_particle(gen);
 
-      	// Random step in sphere
+      	// Random step (in sphere)
       	double r2=2.0;
       	double xold=x.at(p);
 	  	double yold=y.at(p);
 	  	double zold=z.at(p);
+		bool old_is_overlapping = is_overlapping(p);
 	  	double dx,dy,dz;
 	    while(r2>1) {
-			  dx = dice_0to1(gen);
-			  dy = dice_0to1(gen);
-			  dz = dice_0to1(gen);
-			  r2=dx*dx+dy*dy+dz*dz;
+		  dx = dice_m1to1(gen);
+		  dy = dice_m1to1(gen);
+		  dz = dice_m1to1(gen);
+		  r2=dx*dx+dy*dy+dz*dz;
 	  	}
-	  	// Move particles TODO only move if no overlap
-	  	x.at(p)+=dx;
-	  	y.at(p)+=dy;
-	  	z.at(p)+=dz;
+	  	// Move particles, move back if the move result in overlap
+	  	x.at(p)+=dx*step_size;
+	  	y.at(p)+=dy*step_size;
+	  	z.at(p)+=dz*step_size;
+	    attempts++;
+		if( is_overlapping(p) && !old_is_overlapping ){
+	      rejected++;
+		  // Reject move
+		  x.at(p)=xold;
+		  y.at(p)=yold;
+		  z.at(p)=zold;
+		}
 	  }
 	}
+	cout << endl << "Rejected " << rejected << " of " << attempts 
+	  << " MC move attempts (" << 100.0*(double)rejected/(double)attempts << "%)" << endl;
 }
 
+/**
+ Return true if particle p is overlapping wit
+ one of the particle in the neighbour list
+*/
+bool HSSim::is_overlapping(unsigned i){
+  bool found_overlap=false;
+  vector<unsigned> n;
+  cell_list.neighbors(i,n);
+  
+  for(unsigned in=0;in<n.size();in++){
+	unsigned j=n.at(in);
+	if(!found_overlap && i!=j) {
+	  double dx=x.at(j)-x.at(i);
+	  double dy=y.at(j)-y.at(i);
+	  double dz=z.at(j)-z.at(i);
+	  dx-=Lx*nearbyint(dx/Lx);
+	  dy-=Ly*nearbyint(dy/Ly);
+	  dz-=Lz*nearbyint(dz/Lz);
+	  double r2=dx*dx+dy*dy+dz*dz;
+	  static double r2cut=1.0*1.0;
+	  if(r2<r2cut){
+		found_overlap = true;
+	  }
+	}
+  }
+  return found_overlap;
+}
+
+/**
+  Return true if two or more particles are overlapping
+  */
+bool HSSim::is_overlapping(){
+  bool found_overlap=false;
+  for(unsigned i=0;i<x.size();i++)
+	if(is_overlapping(i)) found_overlap=true;
+  return found_overlap;
+}
 
 /**
  * Return a string with various information about the lattice
@@ -431,6 +497,7 @@ string HSSim::info(){
 	out << "Lengths of box vectors:       " << Lx << " " << Ly << " " << Lz << endl;
 	out << "Box volume:                   " << volume() << endl;
 	out << "Number density:               " << number_of_particles()/volume() << endl;
+	out << "Is overlapping:               " << is_overlapping() << endl;
 	out << "rcut:                     rc= " << neighbour_cutoff << endl;
 	
 	return out.str();
