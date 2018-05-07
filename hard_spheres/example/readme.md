@@ -18,7 +18,7 @@ Clean-up
 
 Perform equlibrium simulation
 ```
-  ../bin/hard_spheres -L 16
+  ../bin/hard_spheres -i first.xyz
 ```
 
 Re-compute the radial distribution function
