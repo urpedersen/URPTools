@@ -24,7 +24,7 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 	boost::random::uniform_real_distribution<> dice_0to1( 0.0 , 1.0 );
 	boost::random::uniform_int_distribution<> dice_particle( 0 , number_of_particles()-1 );
 	cout << "  Perform " << frames << " frames of " << steps << " MC steps (constant NpT):" 
-	  << ", stepsize = " << step_size ", pressure = ", pressure << endl;
+	  << ", stepsize = " << step_size << ", pressure = " << pressure << endl;
 
 	unsigned rejected = 0;
 	unsigned attempts = 0;
@@ -63,15 +63,14 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 				Lz*=dL;
 
 				double randf = dice_0to1(gen);
-				beta = 1.0;
 				// See if move should be rejected TODO ....
 				// use implicit beta=1
-				double arg=pressue*dV-number_of_particles()*log(Vnew/Vold);
+				double arg = pressure*dV-number_of_particles()*log(Vnew/Vold);
 				if( randf>exp(arg) ){ // Restore old state
 				  for(unsigned p = 0;p<number_of_particles();p++){
 					x.at(p)/=dL;
 					y.at(p)/=dL;
-			  		z.at(p)==dL;
+			  		z.at(p)/=dL;
 				  }
 				  Lx/=dL;
 				  Ly*=dL;
