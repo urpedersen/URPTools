@@ -52,7 +52,8 @@ public:
 	unsigned number_of_particles_of_type(unsigned test_type);
 	double volume();
 
-	void monte_carlo(unsigned steps,double stepSize,unsigned frames);
+	void monte_carlo_NVT(unsigned steps,double step_size,unsigned frames);
+	void monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,double pressure,double volume_step_size);
 
 	bool is_overlapping(unsigned p);
 	bool is_overlapping();

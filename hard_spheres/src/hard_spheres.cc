@@ -121,7 +121,9 @@ int main(int argc, char **argv) {
 	}
 	
 	// Make MC steps
-	sim.monte_carlo(50,0.1,250);
+	sim.monte_carlo_NVT(50,0.1,250);
+
+	// TODO impliment Event-driven simulation  https://algs4.cs.princeton.edu/61event/
 
 	// Write info to user
 	sim.write_xyz("final.xyz");
