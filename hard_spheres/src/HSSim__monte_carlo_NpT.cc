@@ -29,54 +29,59 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 	unsigned rejected = 0;
 	unsigned attempts = 0;
 
+	cout << "ener: frame volume is_overlapping" << endl;
 	for(unsigned frame=0;frame<frames;frame++){
+	  cout << "enr: " << frame << " " << Lx*Ly*Lz << " " << is_overlapping() << endl;
+      //cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);
+      //	  cout << is_overlapping() <<  endl;
+	  /* Write pretty progress 
 	  if      (frame%50==0 ) cout << endl << frame << "\t|";
-	  else if (frame%10==0) cout << "|";
-	  else if (frame%5==0) cout << ":";
+      else if (frame%10==0 ) cout << "|";
+	  else if (frame%5==0  ) cout << ":";
 	  else if (frame%50==49) cout << ".|";
 	  else cout << ".";
 	  cout << flush;
+	  */
 
-
-	  wrap_into_box(0,0,0);
+	  // wrap_into_box(0,0,0); try and see if removing this fixes it?
+	  cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);
 	  write_xyz("traj.xyz");
 
 	  for(unsigned s=0;s<steps*number_of_particles();s++){
 		
 		// TODO only build neighbour list when nessesary, and safely!
-		if(s%number_of_particles()*5==0){
-	    	cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);
+		if(s%number_of_particles()*5==0) cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);
+
+		if(s%number_of_particles()*1==0 and !is_overlapping()){
 			// Make a volume MC step
 			double Vold=Lx*Ly*Lz;
 			double dV = dice_m1to1(gen)*volume_step_size;
 			double Vnew=Vold+dV;
-			double dL = pow(dV,1./3.);
+			double dL = pow(Vnew/Vold,1./3.);
 			// Scale positions of particles and box (if the configuration is not overlapping)
-			if(!is_overlapping()){
-				for(unsigned p = 0;p<number_of_particles();p++){
-					x.at(p)*=dL;
-					y.at(p)*=dL;
-			  		z.at(p)*=dL;
-				}
-				Lx*=dL;
-				Ly*=dL;
-				Lz*=dL;
-
-				double randf = dice_0to1(gen);
-				// See if move should be rejected TODO ....
-				// use implicit beta=1
-				double arg = pressure*dV-number_of_particles()*log(Vnew/Vold);
-				if( randf>exp(arg) ){ // Restore old state
-				  for(unsigned p = 0;p<number_of_particles();p++){
-					x.at(p)/=dL;
-					y.at(p)/=dL;
-			  		z.at(p)/=dL;
-				  }
-				  Lx/=dL;
-				  Ly*=dL;
-				  Lz*=dL;
-				}
+			for(unsigned p = 0;p<x.size();p++){
+				x.at(p)*=dL;
+				y.at(p)*=dL;
+		  	    z.at(p)*=dL;
 			}
+			Lx*=dL;
+			Ly*=dL;
+			Lz*=dL;
+
+			double randf = dice_0to1(gen);
+			// See if move should be rejected TODO ....
+			// use implicit beta=1
+			double arg = pressure*dV-number_of_particles()*log(Vnew/Vold);
+			if( randf<exp(arg) ){ // Restore old state
+			  for(unsigned p = 0;p<x.size();p++){
+				  x.at(p)/=dL;
+				  y.at(p)/=dL;
+		    	z.at(p)/=dL;
+			  }
+			  Lx/=dL;
+			  Ly/=dL;
+			  Lz/=dL;
+				}
 		}
 		
 		// Pick a random particle, and make a single particle step
@@ -89,7 +94,7 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 	  	double zold=z.at(p);
 		bool old_is_overlapping = is_overlapping(p);
 	  	double dx,dy,dz;
-	    while(r2>1) {
+	    while(r2>1.0) {
 		  dx = dice_m1to1(gen);
 		  dy = dice_m1to1(gen);
 		  dz = dice_m1to1(gen);
@@ -99,7 +104,8 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 	  	x.at(p)+=dx*step_size;
 	  	y.at(p)+=dy*step_size;
 	  	z.at(p)+=dz*step_size;
-	    attempts++;
+	    
+		attempts++;
 		if( is_overlapping(p) && !old_is_overlapping ){
 	      rejected++;
 		  // Reject move
