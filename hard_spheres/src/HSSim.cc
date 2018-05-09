@@ -54,7 +54,7 @@ HSSim::HSSim() :
 		Lx(1.0),
 		Ly(1.0),
 		Lz(1.0),
-		neighbour_cutoff(1.5)
+		neighbour_cutoff(2.0)
 	{
 	// Do nothing in constructor
 }
@@ -426,9 +426,6 @@ bool HSSim::is_overlapping(){
  */
 string HSSim::info(){
 
-  cout << number_of_particles() << endl;
-	// Compute mean values
-
 	stringstream out;
 	out << "Total number of particles:    " << number_of_particles() << endl;
 	out << "Number of types:              " << number_of_types() << endl;
@@ -444,3 +441,16 @@ string HSSim::info(){
 	
 	return out.str();
 }
+
+// Print information on a particle
+string HSSim::info(unsigned p){
+	stringstream out;
+	out << p << " xyz=[" << x.at(p) << "," << y.at(p) << "," << z.at(p) << "]; is_overlapping=" << is_overlapping(p);
+	out << "; neighbours:";
+	vector<unsigned> n;
+	cell_list.neighbors(p,n);
+	for(unsigned in=0;in<n.size();in++) out << " " << n.at(in);
+	return out.str();
+}
+  
+

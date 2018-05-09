@@ -24,9 +24,12 @@ int main(int argc, char **argv) {
 	// Set default values
 	bool quiet=false;
 	string ifilename = "none";
+	unsigned time_steps = 20;
 	double Lx=16,Ly=16,Lz=16;
-	double neighbour_cutoff=1.5;
+	double neighbour_cutoff=2.0;
 	string ofilename = "traj.xyz";
+	double pressure = 1.0;
+	double volume_step = 0.0;
 
 	// Handle command line options
 	vector<string> vecstr;
@@ -36,13 +39,16 @@ int main(int argc, char **argv) {
 				{"help",	no_argument      , 0, 'h'},
 				{"quiet",	no_argument      , 0, 'q'},
 				{"input",	optional_argument, 0, 'i'},
+				{"time_steps", optional_argument, 0, 't'},
 				{"Lengths",	optional_argument, 0, 'L'},
+				{"pressure",optional_argument, 0, 'p'},
+				{"volume_step",optional_argument, 0, 'v'},
 				{"rcut",	optional_argument, 0, 'r'},
 				{"output",	optional_argument, 0, 'o'},
 				{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		c = getopt_long (argc, argv, "hql:i:f:sL:r:Q:S:o:O:c",long_options,&option_index);
+		c = getopt_long (argc, argv, "hq:i:t:L:p:v:r:o:",long_options,&option_index);
 		if(c==-1) break;
 		switch (c) {
 		/*case 0:
@@ -59,8 +65,13 @@ int main(int argc, char **argv) {
 			cout << " -r, --rcut=NUM     [1.4]       Neighbour cut-off distance." << endl;
 			cout << " -i, --input=FILE   [none]      Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
 			cout << "                                  Default [none]: an ideal gas configuration." << endl;
+			cout << " -t  --time_steps=INT           Time steps per frame" << endl;
+			cout << "                                  Default: 20" << endl;
 			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box," << endl;
-			cout << "     --Lenghts=NUM,NUM,NUM        unless it is provided in the input file." << endl; 
+			cout << "     --Lenghts=NUM,NUM,NUM        unless it is provided in the input file." << endl;
+			cout << " -p  --pressure=NUM             Pressure for barostat (if applied)." << endl;
+			cout << " -v  --volume_step=NUM          Volume step for barostat (if applied)." << endl;
+			cout << "                                  The default is 0.0 resulting in a NVT simulation" << endl;
 			cout << " -o, --output=FILE  [none]      Output file (*.xyz or *.xyz.gz)." << endl;
 			exit(0);
 			break;
@@ -73,6 +84,8 @@ int main(int argc, char **argv) {
 		case 'i':
 			ifilename = optarg;
 			break;
+		case 't':
+			time_steps = atoi(optarg);
 		case 'L':
 			vecstr = split(optarg,',');
 			if( vecstr.size()==1 ) {
@@ -87,6 +100,12 @@ int main(int argc, char **argv) {
 				cerr << "error: unknown input for -L, --Lengths.\nTry -h or --help for more information." << endl;
 				abort();
 			}
+			break;
+		case 'p':
+			pressure = atof(optarg);
+			break;
+		case 'v':
+			volume_step = atof(optarg);
 			break;
 		case 'o':
 			ofilename = optarg;
@@ -121,8 +140,8 @@ int main(int argc, char **argv) {
 	}
 	
 	// Make MC steps
-	sim.monte_carlo_NVT(50,0.1,250);
-	//sim.monte_carlo_NpT(200,0.2,250,10,1);
+	//sim.monte_carlo_NVT(50,0.1,250);
+	sim.monte_carlo_NpT(time_steps,0.1,250,pressure,volume_step);
 
 	// TODO impliment Event-driven simulation  https://algs4.cs.princeton.edu/61event/
 

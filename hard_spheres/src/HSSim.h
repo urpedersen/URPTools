@@ -59,6 +59,7 @@ public:
 	bool is_overlapping();
 
 	string info();
+	string info(unsigned p);
 };
 
 #endif // HSSIM_H
