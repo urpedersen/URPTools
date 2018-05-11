@@ -25,8 +25,10 @@ int main(int argc, char **argv) {
 	bool quiet=false;
 	string ifilename = "none";
 	unsigned time_steps = 20;
+	unsigned frames = 250;
+	double step_length = 0.05;
 	double Lx=16,Ly=16,Lz=16;
-	double neighbour_cutoff=2.0;
+	double neighbour_cutoff=1.7;
 	string ofilename = "traj.xyz";
 	double pressure = 1.0;
 	double volume_step = 0.0;
@@ -40,6 +42,8 @@ int main(int argc, char **argv) {
 				{"quiet",	no_argument      , 0, 'q'},
 				{"input",	optional_argument, 0, 'i'},
 				{"time_steps", optional_argument, 0, 't'},
+				{"frames",  optional_argument, 0, 'f'},
+				{"step_length",optional_argument, 0, 's'},
 				{"Lengths",	optional_argument, 0, 'L'},
 				{"pressure",optional_argument, 0, 'p'},
 				{"volume_step",optional_argument, 0, 'v'},
@@ -48,7 +52,7 @@ int main(int argc, char **argv) {
 				{0, 0, 0, 0}
 		};
 		int option_index = 0;
-		c = getopt_long (argc, argv, "hq:i:t:L:p:v:r:o:",long_options,&option_index);
+		c = getopt_long (argc, argv, "hq:i:t:f:s:L:p:v:r:o:",long_options,&option_index);
 		if(c==-1) break;
 		switch (c) {
 		/*case 0:
@@ -59,20 +63,22 @@ int main(int argc, char **argv) {
 			break;*/
 		case 'h':
 			cout << endl;
-			cout << "      Simulations of hard-spheres," << endl;
-			cout << " -h, --help                     Prints this help." << endl;
-			cout << " -q, --quiet                    Hide program output." << endl;
-			cout << " -r, --rcut=NUM     [1.4]       Neighbour cut-off distance." << endl;
-			cout << " -i, --input=FILE   [none]      Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
-			cout << "                                  Default [none]: an ideal gas configuration." << endl;
-			cout << " -t  --time_steps=INT           Time steps per frame" << endl;
-			cout << "                                  Default: 20" << endl;
-			cout << " -L, --Lenghts=NUM  [10]        Size of periodic box," << endl;
-			cout << "     --Lenghts=NUM,NUM,NUM        unless it is provided in the input file." << endl;
-			cout << " -p  --pressure=NUM             Pressure for barostat (if applied)." << endl;
-			cout << " -v  --volume_step=NUM          Volume step for barostat (if applied)." << endl;
-			cout << "                                  The default is 0.0 resulting in a NVT simulation" << endl;
-			cout << " -o, --output=FILE  [none]      Output file (*.xyz or *.xyz.gz)." << endl;
+			cout << "      Simulation of hard-spheres, by Ulf R. Pedersen (http://urp.dk)." << endl << endl;
+			cout << " -h, --help                       Prints this help." << endl;
+			cout << " -q, --quiet                      Hide program output." << endl;
+			cout << " -r, --rcut=NUM        [1.7]      Neighbour cut-off distance." << endl;
+			cout << " -i, --input=FILE      [none]     Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
+			cout << "                                    Default [none]: an ideal gas configuration." << endl;
+			cout << " -t, --time_steps=INT  [20]       Time steps per frame." << endl;
+			cout << " -f, --frames=INT      [250]      Number of frames." << endl;
+			cout << " .s, --step_length=NUM [0.05]      The maximum particle step length." << endl;
+			cout << " -L, --Lenghts=NUM     [10]          Size of periodic box," << endl;
+			cout << "     --Lenghts=NUM,NUM,NUM           used when not provided in the input file." << endl;
+			cout << " -p, --pressure=NUM    [1.0]       Pressure for barostat (if applied)." << endl;
+			cout << " -v, --volume_step=NUM [0.0]       Volume step for barostat (if applied)." << endl;
+			cout << "                                     The default is 0.0 resulting in a NVT simulation" << endl;
+			cout << " -o, --output=FILE     [traj.xyz]  Output file for trajectory (*.xyz or *.xyz.gz)." << endl << endl;
+			cout << "  Documentation and source code on github: https://github.com/urpedersen/URPTools " << endl << endl;
 			exit(0);
 			break;
 		case 'q':
@@ -86,6 +92,12 @@ int main(int argc, char **argv) {
 			break;
 		case 't':
 			time_steps = atoi(optarg);
+			break;
+		case 'f':
+			frames = atoi(optarg);
+			break;
+		case 's':
+			step_length = atof(optarg);
 		case 'L':
 			vecstr = split(optarg,',');
 			if( vecstr.size()==1 ) {
@@ -141,7 +153,7 @@ int main(int argc, char **argv) {
 	
 	// Make MC steps
 	//sim.monte_carlo_NVT(50,0.1,250);
-	sim.monte_carlo_NpT(time_steps,0.1,250,pressure,volume_step);
+	sim.monte_carlo_NpT(time_steps,frames,step_length,pressure,volume_step);
 
 	// TODO impliment Event-driven simulation  https://algs4.cs.princeton.edu/61event/
 

@@ -2,7 +2,7 @@
 
 Perform a simulation from an ideal gas configuration
 ```
-  ../bin/hard_spheres -L 16
+  ../bin/hard_spheres -i test.xyz -p 1.0 -v 0.1 
 ```
 
 Compute the radial distribution function
@@ -23,6 +23,6 @@ Perform equlibrium simulation
 
 Re-compute the radial distribution function
 ```
-  ../../traj/bin/traj_gr --load_traj_type=3 --bboxX=16
+  ../../traj/bin/traj_gr --load_traj_type=3 --bboxX=14.5097 
 ```
 

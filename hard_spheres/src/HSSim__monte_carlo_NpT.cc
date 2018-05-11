@@ -19,7 +19,7 @@ using namespace std;
 /**
   Run a monte_carlo (MC) simulation
 */
-void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,double pressure,double volume_step_size){
+void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,double pressure,double volume_step_size){
 	boost::random::uniform_real_distribution<> dice_m1to1( -1.0 , 1.0 );
 	boost::random::uniform_real_distribution<> dice_0to1( 0.0 , 1.0 );
 	boost::random::uniform_int_distribution<> dice_particle( 0 , number_of_particles()-1 );
@@ -28,6 +28,8 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 
 	unsigned rejected = 0;
 	unsigned attempts = 0;
+	unsigned rejected_volume = 0;
+	unsigned attempts_volume = 0;
 
 	cout << "ener: frame volume packing_fraction" << endl;
 	for(unsigned frame=0;frame<frames;frame++){
@@ -39,9 +41,8 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 	  else if (frame%50==49) cout << ".|";
 	  else cout << ".";
 	  */
-	  static double pi = atan(1)*4;
 	  double volume = Lx*Ly*Lz;
-	  double packing_fraction = (double)x.size()*4./3.*pi/volume;
+	  double packing_fraction = (double)x.size()*atan(1)*4/6/volume; 
 	  cout << "ener: " << frame << " " << volume << " " << packing_fraction << " "  << endl;
 	  cout << flush;
 
@@ -51,14 +52,14 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 
 	  for(unsigned s=0;s<steps*x.size();s++){
 		
-		// TODO only build neighbour list when nessesary, and safely!
+		// TODO only build neighbour list when nessesary, and safely (using a skin).
 		if(s%number_of_particles()*5==0){
 		  if(is_overlapping()){cout << "error: Overlap (before NL update)"<<endl;for(unsigned i=0;i<x.size();i++) if(is_overlapping(i)) cout << info(i) << endl;exit(0);}
 		  cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);
 		  if(is_overlapping()){cout << "error: Overlap (after NL update)"<<endl;for(unsigned i=0;i<x.size();i++) if(is_overlapping(i)) cout << info(i) << endl;exit(0);}
 		}
 
-		if(s%number_of_particles()*1==0 and !is_overlapping()){
+		if(s%number_of_particles()*1==0 and volume_step_size>0.0 and !is_overlapping()){
 			// Make a volume MC step
 			double Vold=Lx*Ly*Lz;
 			double dV = dice_m1to1(gen)*volume_step_size;
@@ -74,20 +75,22 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 			Ly*=dL;
 			Lz*=dL;
 
+			// Accept move at random
+			// implicit use temperature one, i.e. beta=1
 			double randf = dice_0to1(gen);
-			// See if move should be rejected TODO ....
-			// use implicit beta=1
 			double arg = pressure*dV-number_of_particles()*log(Vnew/Vold);
+			attempts_volume++;
 			if( randf<exp(arg) || is_overlapping() ){ // Restore old state
+			  rejected_volume++;
 			  for(unsigned p = 0;p<x.size();p++){
-				  x.at(p)/=dL;
-				  y.at(p)/=dL;
-		    	z.at(p)/=dL;
+				x.at(p)/=dL;
+				y.at(p)/=dL;
+				z.at(p)/=dL;
 			  }
 			  Lx/=dL;
 			  Ly/=dL;
 			  Lz/=dL;
-				}
+			}
 		}
 		
 		// Pick a random particle, and make a single particle step
@@ -125,5 +128,7 @@ void HSSim::monte_carlo_NpT(unsigned steps,double step_size,unsigned frames,doub
 	}
 	cout << endl << "Rejected " << rejected << " of " << attempts 
 	  << " MC move attempts (" << 100.0*(double)rejected/(double)attempts << "%)" << endl;
+	cout << endl << "Rejected " << rejected_volume << " of " << attempts_volume
+	  << " volume change attempts (" << 100.0*(double)rejected_volume/(double)attempts_volume << "%)" << endl;
 }
 

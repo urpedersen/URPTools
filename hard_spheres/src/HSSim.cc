@@ -127,6 +127,7 @@ double HSSim::volume(){
 
 /**
   Generate an ideal gas configuration
+TODO: make a configuration with no overlap
 */
 void HSSim::generate_ideal_gas_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz){
 	type.clear();
@@ -436,6 +437,7 @@ string HSSim::info(){
 	out << "Lengths of box vectors:       " << Lx << " " << Ly << " " << Lz << endl;
 	out << "Box volume:                   " << volume() << endl;
 	out << "Number density:               " << number_of_particles()/volume() << endl;
+	out << "Packing fraction:             " << number_of_particles()*0.523598775598299/volume() << endl;
 	out << "Is overlapping:               " << is_overlapping() << endl;
 	out << "rcut:                     rc= " << neighbour_cutoff << endl;
 	

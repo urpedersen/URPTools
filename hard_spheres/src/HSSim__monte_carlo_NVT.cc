@@ -19,7 +19,7 @@ using namespace std;
 /**
   Run a monte_carlo (MC) simulation
 */
-void HSSim::monte_carlo_NVT(unsigned steps,double step_size,unsigned frames){
+void HSSim::monte_carlo_NVT(unsigned steps,unsigned frames,double step_size){
 	boost::random::uniform_real_distribution<> dice_m1to1( -1.0 , 1.0 );
 	boost::random::uniform_real_distribution<> dice_0to1( 0.0 , 1.0 );
 	boost::random::uniform_int_distribution<> dice_particle( 0 , number_of_particles()-1 );
