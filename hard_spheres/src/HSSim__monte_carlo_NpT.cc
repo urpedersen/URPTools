@@ -30,6 +30,9 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 	unsigned attempts = 0;
 	unsigned rejected_volume = 0;
 	unsigned attempts_volume = 0;
+	unsigned overlap_tests = 0; // Count overlapping configurations
+	unsigned overlap_hits_before = 0;
+	unsigned overlap_hits_after = 0;
 
 	cout << "ener: frame volume packing_fraction" << endl;
 	for(unsigned frame=0;frame<frames;frame++){
@@ -48,15 +51,16 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 
 	  wrap_into_box(0,0,0);
 	  //cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);
-	  write_xyz("traj.xyz");
+	  write_xyz(ofilename,true);
 
 	  for(unsigned s=0;s<steps*x.size();s++){
 		
 		// TODO only build neighbour list when nessesary, and safely (using a skin).
-		if(s%number_of_particles()*5==0){
-		  if(is_overlapping()){cout << "error: Overlap (before NL update)"<<endl;for(unsigned i=0;i<x.size();i++) if(is_overlapping(i)) cout << info(i) << endl;exit(0);}
+		if(s%number_of_particles()*10==0){
+		  overlap_tests++;
+		  if(is_overlapping()) overlap_hits_before++;
 		  cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);
-		  if(is_overlapping()){cout << "error: Overlap (after NL update)"<<endl;for(unsigned i=0;i<x.size();i++) if(is_overlapping(i)) cout << info(i) << endl;exit(0);}
+		  if(is_overlapping()) overlap_hits_after++;
 		}
 
 		if(s%number_of_particles()*1==0 and volume_step_size>0.0 and !is_overlapping()){
@@ -126,7 +130,9 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 		}
 	  }
 	}
-	cout << endl << "Rejected " << rejected << " of " << attempts 
+	cout << "Tested " << overlap_tests << " configutations and found " << overlap_hits_before << " before neighbour list updates (NLU)" << endl;
+	cout <<         "  and " << overlap_hits_after << " after NLU." << endl;
+	cout << "Rejected " << rejected << " of " << attempts 
 	  << " MC move attempts (" << 100.0*(double)rejected/(double)attempts << "%)" << endl;
 	cout << endl << "Rejected " << rejected_volume << " of " << attempts_volume
 	  << " volume change attempts (" << 100.0*(double)rejected_volume/(double)attempts_volume << "%)" << endl;

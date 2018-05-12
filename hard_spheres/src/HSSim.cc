@@ -29,18 +29,9 @@
 
 using namespace std;
 
-// Class functions are in seperate files
+// Class functions in seperate files
 #include "HSSim__monte_carlo_NVT.cc"
 #include "HSSim__monte_carlo_NpT.cc"
-
-/**
- * Split a string into a vector string
-vector<string> rotational_order_split(string str, char delimiter) {
-  vector<string> output;stringstream ss(str);string substr;
-  while(getline(ss, substr, delimiter)) output.push_back(substr);
-  return output;
-}
- */
 
 /**
  * Constructor
@@ -54,7 +45,8 @@ HSSim::HSSim() :
 		Lx(1.0),
 		Ly(1.0),
 		Lz(1.0),
-		neighbour_cutoff(2.0)
+		neighbour_cutoff(2.0),
+		ofilename("traj.xyz")
 	{
 	// Do nothing in constructor
 }
@@ -89,6 +81,9 @@ void HSSim::set_neighbour_cutoff(double in_neighbour_cutoff){
   neighbour_cutoff = in_neighbour_cutoff;
 }
 
+void HSSim::set_ofilename(string in_ofilename){
+  ofilename = in_ofilename;
+}
 
 /**
  * Return the number of particles
@@ -129,7 +124,7 @@ double HSSim::volume(){
   Generate an ideal gas configuration
 TODO: make a configuration with no overlap
 */
-void HSSim::generate_ideal_gas_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz){
+void HSSim::generate_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz){
 	type.clear();
 	x.clear();
 	y.clear();
@@ -145,7 +140,8 @@ void HSSim::generate_ideal_gas_positions(unsigned num_particles,double in_Lx,dou
 	  float random_x = dice(gen)*Lx;
 	  float random_y = dice(gen)*Ly;
 	  float random_z = dice(gen)*Lz;
-	  add_particle(0,random_x,random_y,random_z);
+	  static unsigned type = 0;
+	  add_particle(type,random_x,random_y,random_z);
 	}	
 	
 	cell_list.build(x,y,z,Lx,Ly,Lz,neighbour_cutoff);	
@@ -345,13 +341,13 @@ void HSSim::wrap_into_box(double xO,double yO,double zO){
   Write coordinates to traj.xyz
 */
 void HSSim::write_xyz(){
-  write_xyz("traj.xyz");
+  write_xyz("traj.xyz",true);
 }
 
 /**
  * Write coordinates of particles to xyz-file.
  */
-void HSSim::write_xyz(string ofilename){
+void HSSim::write_xyz(string ofilename,bool append){
 	using namespace boost::iostreams;
 	
 	vector<string> fnames = split(ofilename,'.');
@@ -362,10 +358,10 @@ void HSSim::write_xyz(string ofilename){
 		abort();
 	}
 	if(fnames.back()=="xyz"){
-		out.push(file_sink(ofilename,ios_base::app));
+	  append?out.push(file_sink(ofilename,ios_base::app)):out.push(file_sink(ofilename));
 	} else if ( fnames.back()=="gz" && fnames.at(fnames.size()-2)=="xyz" )  {
 		out.push(gzip_compressor());
-		out.push(file_sink(ofilename,ios_base::app));
+		append?out.push(file_sink(ofilename,ios_base::app)):out.push(file_sink(ofilename));
 	} else {
 		cerr << "error: Incompatible name of output file. Should be *.xyz or *.xyz.gz" << endl;
 		abort();

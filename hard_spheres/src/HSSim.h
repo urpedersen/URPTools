@@ -28,6 +28,8 @@ private:
 	double Ly;
 	double Lz;
 	double neighbour_cutoff;
+
+	string ofilename;
 	
 	boost::random::mt19937 gen;
 
@@ -39,13 +41,14 @@ public:
 	
 	void add_particle(unsigned in_type,double in_x,double in_y,double in_z);
 	void set_neighbour_cutoff(double in_neighbour_cutoff);
+	void set_ofilename(string ofilename);
 
-  void generate_ideal_gas_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz);
+  void generate_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz);
   bool load_xyz(string ifilename);
 	bool load_xyz(string ifilename,unsigned frame,double Lx,double Ly,double Lz);
 	void wrap_into_box(double xO,double yO,double zO);
 	void write_xyz();
-	void write_xyz(string ofilename);
+	void write_xyz(string ofilename,bool append);
 
 	unsigned number_of_particles();
 	unsigned number_of_types();

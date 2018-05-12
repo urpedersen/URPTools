@@ -39,7 +39,7 @@ void HSSim::monte_carlo_NVT(unsigned steps,unsigned frames,double step_size){
 
 
 	  wrap_into_box(0,0,0);
-	  write_xyz("traj.xyz");
+	  write_xyz("traj.xyz",true);
 
 	  for(unsigned s=0;s<steps*number_of_particles();s++){
 		// TODO only build neighbour list when nessesary, and safely!

@@ -98,6 +98,7 @@ int main(int argc, char **argv) {
 			break;
 		case 's':
 			step_length = atof(optarg);
+			break;
 		case 'L':
 			vecstr = split(optarg,',');
 			if( vecstr.size()==1 ) {
@@ -137,10 +138,11 @@ int main(int argc, char **argv) {
 	// Create object to compute rotational order
 	HSSim sim;
 	sim.set_neighbour_cutoff(neighbour_cutoff);
+	sim.set_ofilename(ofilename);
 	int load_frame = 0;
 	if(ifilename=="none")
 	{
-    	sim.generate_ideal_gas_positions(1000,Lx,Ly,Lz);
+    	sim.generate_positions(1000,Lx,Ly,Lz);
 	  	cout << sim.info() << endl;
 	} else {
 		bool sucessfull_load = sim.load_xyz(ifilename,load_frame,Lx,Ly,Lz);
@@ -158,7 +160,7 @@ int main(int argc, char **argv) {
 	// TODO impliment Event-driven simulation  https://algs4.cs.princeton.edu/61event/
 
 	// Write info to user
-	sim.write_xyz("final.xyz");
+	sim.write_xyz("final.xyz",false);
 	cout << sim.info() << endl;
 
 	return 0;
