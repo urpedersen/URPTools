@@ -22,7 +22,7 @@ Clean-up, and run NpT simulation
 ```
   mv final.xyz first.xyz
   rm traj.xyz
-  ../bin/hard_spheres -i first.xyz -p 1.0 -v 0.5 -t 2000 | tee hard_spheres.log
+  ../bin/hard_spheres -i first.xyz -p 1.0 -v 0.01 -t 50 | tee hard_spheres.log
 ```
 
 Plot time-trajectory of packing fraction
@@ -31,9 +31,9 @@ Plot time-trajectory of packing fraction
   xmgrace thermo.dat
 ```
 
-Compute the radial distribution function (N.B, you m)
+Compute the radial distribution function.
 ```
-  ../../traj/bin/traj_gr --load_traj_type=3 --bboxX=10.13
+  ../../traj/bin/traj_gr --load_traj_type=3
 ```
 
 
@@ -44,6 +44,12 @@ Perform equlibrium simulation
 
 Compute the radial distribution function
 ```
-  ../../traj/bin/traj_gr --load_traj_type=3 --bboxX=14.5097 
+  ../../traj/bin/traj_gr --load_traj_type=3 -o Q6.xyz
+```
+
+Conpute rotational order
+```
+../../rotational_order/bin/Q6 -r 1.3 -o Q6.xyz -Q 0.2,1.0
+awk '{print $7}' Q6.xyz > tmp.dat
 ```
 

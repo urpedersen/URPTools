@@ -65,35 +65,35 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 
 		if(s%number_of_particles()*1==0 and volume_step_size>0.0 and !is_overlapping()){
 			// Make a volume MC step
-			double Vold=Lx*Ly*Lz;
-			double dV = dice_m1to1(gen)*volume_step_size;
-			double Vnew=Vold+dV;
-			double dL = pow(Vnew/Vold,1./3.);
+			double lnV_old = log(Lx*Ly*Lz);
+			double lnV_new = lnV_old + dice_m1to1(gen)*volume_step_size;
+			double dV = exp(lnV_new)-exp(lnV_old);
+			double scale_factor = exp((lnV_new-lnV_old)/3.0);
 			// Scale positions of particles and box (if the configuration is not overlapping)
 			for(unsigned p = 0;p<x.size();p++){
-				x.at(p)*=dL;
-				y.at(p)*=dL;
-		  	    z.at(p)*=dL;
+				x.at(p)*=scale_factor;
+				y.at(p)*=scale_factor;
+		  	    z.at(p)*=scale_factor;
 			}
-			Lx*=dL;
-			Ly*=dL;
-			Lz*=dL;
+			Lx*=scale_factor;
+			Ly*=scale_factor;
+			Lz*=scale_factor;
 
 			// Accept move at random
 			// implicit use temperature one, i.e. beta=1
-			double randf = dice_0to1(gen);
-			double arg = pressure*dV-number_of_particles()*log(Vnew/Vold);
 			attempts_volume++;
-			if( randf<exp(arg) || is_overlapping() ){ // Restore old state
+			double arg = -pressure*dV+(number_of_particles()+1)*(lnV_new-lnV_old);
+			double randf = dice_0to1(gen);
+			if( randf>exp(arg) || is_overlapping() ){ // Reject, and restore old state
 			  rejected_volume++;
 			  for(unsigned p = 0;p<x.size();p++){
-				x.at(p)/=dL;
-				y.at(p)/=dL;
-				z.at(p)/=dL;
+				x.at(p)/=scale_factor;
+				y.at(p)/=scale_factor;
+				z.at(p)/=scale_factor;
 			  }
-			  Lx/=dL;
-			  Ly/=dL;
-			  Lz/=dL;
+			  Lx/=scale_factor;
+			  Ly/=scale_factor;
+			  Lz/=scale_factor;
 			}
 		}
 		
@@ -132,9 +132,9 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 	}
 	cout << "Tested " << overlap_tests << " configutations and found " << overlap_hits_before << " before neighbour list updates (NLU)" << endl;
 	cout <<         "  and " << overlap_hits_after << " after NLU." << endl;
-	cout << "Rejected " << rejected << " of " << attempts 
-	  << " MC move attempts (" << 100.0*(double)rejected/(double)attempts << "%)" << endl;
-	cout << endl << "Rejected " << rejected_volume << " of " << attempts_volume
-	  << " volume change attempts (" << 100.0*(double)rejected_volume/(double)attempts_volume << "%)" << endl;
+	cout << "Accepted " << attempts-rejected << " of " << attempts 
+	  << " MC move attempts (" << 100.0*(1.0-(double)rejected/(double)attempts) << "%)" << endl;
+	cout << "Accepted " << attempts_volume-rejected_volume << " of " << attempts_volume
+	  << " volume change attempts (" << 100.0*(1-(double)rejected_volume/(double)attempts_volume) << "%)" << endl;
 }
 

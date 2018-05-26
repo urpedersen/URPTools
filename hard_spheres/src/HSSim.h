@@ -32,7 +32,7 @@ private:
 	string ofilename;
 	
 	boost::random::mt19937 gen;
-
+	
 public:
 	HSSim();
 	virtual ~HSSim();
@@ -43,8 +43,8 @@ public:
 	void set_neighbour_cutoff(double in_neighbour_cutoff);
 	void set_ofilename(string ofilename);
 
-  void generate_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz);
-  bool load_xyz(string ifilename);
+	void generate_positions(unsigned num_particles,double in_Lx,double in_Ly,double in_Lz);
+	bool load_xyz(string ifilename);
 	bool load_xyz(string ifilename,unsigned frame,double Lx,double Ly,double Lz);
 	void wrap_into_box(double xO,double yO,double zO);
 	void write_xyz();
@@ -55,7 +55,7 @@ public:
 	unsigned number_of_particles_of_type(unsigned test_type);
 	double volume();
 
-	void monte_carlo_NVT(unsigned steps,unsigned frames,double step_size);
+	void monte_carlo_NVT(unsigned steps,unsigned frames,double step_size); // TODO remove, obselete
 	void monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,double pressure,double volume_step_size);
 
 	bool is_overlapping(unsigned p);
