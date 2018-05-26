@@ -278,7 +278,11 @@ void Traj::radial_distribution(string ofilename){
 	int frame_stride=get_variable(variables,"frame_stride_gr",1);
 
 	double dr;
+	double sum_volume = 0.0;
+	int sum_atoms = 0;
 	for ( int frame = 0 ; frame < num_frames ; frame+=frame_stride ) {
+		sum_volume += bbox[frame*3+0]*bbox[frame*3+1]*bbox[frame*3+1];
+		sum_atoms +=  num_atoms;
 		for ( int atom0 = 0 ; atom0 < num_atoms-1 ; atom0++ ) {
 			for ( int atom1 = atom0+1 ; atom1 < num_atoms ; atom1++ ) {
 				dr = get_dr_img(atom0,atom1,frame);
@@ -294,10 +298,11 @@ void Traj::radial_distribution(string ofilename){
 	fprintf (ofile, "# Radial distribution function [center of bin; radial distribution in units of number density]\n");
 
 	double V_shell;
+	double avg_density = (double)sum_atoms/sum_volume;
 	for(int bin=0;bin<num_bins;bin++){
 		dr = bin_width*(double)bin;
 		V_shell = 4.0/3.0*PI*( (dr+bin_width)*(dr+bin_width)*(dr+bin_width)-dr*dr*dr );
-		fprintf (ofile, "%f %f\n",dr+0.5*bin_width,(double)bins[bin]/V_shell/(double)num_frames/(double)num_atoms);
+		fprintf (ofile, "%f %f\n",dr+0.5*bin_width,(double)bins[bin]/V_shell/(double)num_frames/(double)num_atoms/avg_density);
 	}
 
 	fclose(ofile);

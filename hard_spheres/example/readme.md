@@ -36,20 +36,26 @@ Compute the radial distribution function.
   ../../traj/bin/traj_gr --load_traj_type=3
 ```
 
-
-Perform equlibrium simulation
+Perform equlibrium NVT simulation
 ```
+  mv final.xyz first.xyz
+  rm traj.xyz
   ../bin/hard_spheres -i first.xyz
 ```
 
 Compute the radial distribution function
 ```
-  ../../traj/bin/traj_gr --load_traj_type=3 -o Q6.xyz
+  ../../traj/bin/traj_gr --load_traj_type=3
 ```
 
-Conpute rotational order
+Compute mean squared displacement
+```
+../../traj/bin/traj_msd --load_traj_type=3
+xmgrace -log xy msd.dat
+```
+
+Compute rotational order
 ```
 ../../rotational_order/bin/Q6 -r 1.3 -o Q6.xyz -Q 0.2,1.0
-awk '{print $7}' Q6.xyz > tmp.dat
 ```
 

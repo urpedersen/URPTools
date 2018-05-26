@@ -36,6 +36,7 @@ string set_variable_string(int, char **);
 int get_variable(string,string,int);
 double get_variable(string,string,double);
 // TODO string get_commandline_variable(string,string,string);
+vector<string> split(string str, char delimiter);
 double first_x_where_y_equals_y0(double *y,int N,double y0);
 
 // Reading trajectory files
@@ -160,8 +161,6 @@ int get_variable(string variable_string,string variable_name,int default_value){
 
 
 
-
-
 /**
 *   Same as int get_variable(string variable_string,string variable_name,int default_value)
 *     but returns a double
@@ -190,6 +189,22 @@ double get_variable(string variable_string,string variable_name,double default_v
 	}
 	return default_value;
 }
+
+
+/**
+ * Split a string into a vector string
+ * @param str
+ * @param delimiter
+ */
+vector<string> split(string str, char delimiter) {
+    vector<string> output;
+    stringstream ss(str);
+    string substr;
+    while(getline(ss, substr, delimiter)) 
+        output.push_back(substr);
+    return output;
+}
+
 
 /**
  *	Return values where y(x)=y0
@@ -232,7 +247,8 @@ void get_metadata_traj(string commandline, int *ptr_num_frames, int *ptr_num_ato
 		cout << "      Use the GROMACS trjconv program like this to get image positions correct:" << endl;
 		cout << "      echo 0 | trjconv -o traj.gro -pbc nojump" << endl;
 		cout << "  load_traj_type=3 : XYZ (simple) traj.xyz file." << endl;
-		cout << "      Note, use the flags bboxX, bboxY and bboxZ to set periodic boundaries." << endl;
+		cout << "      Try to read box from comment line (example: sim_box=RectangularSimulationBox,10,10,10" << endl;
+		cout << "      or use the flags bboxX, bboxY and bboxZ to set periodic boundaries." << endl;
 	}
 
 	switch (load_traj_type) {
@@ -773,6 +789,24 @@ int load_xyzfile (
 			string line;
 			getline (ifile,line); // Number of atoms TODO make consistency check
 			getline (ifile,line); // Header
+
+			// Try to read size of box from header
+			// Attempt to find box vectors in header
+			vector<string> sections = split(line,' ');
+			for(unsigned i = 0 ; i < sections.size() ; i++){
+				vector<string> elements = split(sections.at(i),'=');
+				if(elements.size()>0 && elements.at(0)=="sim_box" && elements.size()==2){
+					vector<string> vars = split(elements.at(1),',');
+					if(elements.size()>0 && vars.at(0)=="RectangularSimulationBox" && vars.size()==4){
+						double Lx = atof(vars.at(1).c_str()); 
+						double Ly = atof(vars.at(2).c_str()); 
+						double Lz = atof(vars.at(3).c_str());
+						bbox[frame*3+0]=Lx;
+						bbox[frame*3+1]=Ly;
+						bbox[frame*3+2]=Lz;
+					}
+				}
+			}
 
 			if(verbose>6) cout << line << endl;
 			for (int atom=0;atom<num_atoms;atom++){
