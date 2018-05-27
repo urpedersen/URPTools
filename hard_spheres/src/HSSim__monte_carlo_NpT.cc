@@ -23,8 +23,13 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 	boost::random::uniform_real_distribution<> dice_m1to1( -1.0 , 1.0 );
 	boost::random::uniform_real_distribution<> dice_0to1( 0.0 , 1.0 );
 	boost::random::uniform_int_distribution<> dice_particle( 0 , number_of_particles()-1 );
-	cout << "  Perform " << frames << " frames of " << steps << " MC steps (constant NpT):" 
-	  << ", stepsize = " << step_size << ", pressure = " << pressure << endl;
+	if(volume_step_size>0){
+	  cout << "  Perform " << frames << " frames of " << steps << " MC steps (constant NpT):" 
+	  << ", step_size = " << step_size << ", pressure = " << pressure << ", volume_step_size = " << volume_step_size << endl;
+	} else {
+	  cout << "  Perform " << frames << " frames of " << steps << " MC steps (constant NVT): step_size = " 
+		<< step_size << endl; 
+	}
 
 	unsigned rejected = 0;
 	unsigned attempts = 0;
@@ -34,7 +39,7 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 	unsigned overlap_hits_before = 0;
 	unsigned overlap_hits_after = 0;
 
-	cout << "ener: frame volume packing_fraction" << endl;
+	cout << "ener: frame packing_fraction" << endl;
 	for(unsigned frame=0;frame<frames;frame++){
       //	  cout << is_overlapping() <<  endl;
 	  /* Write pretty progress 
@@ -130,7 +135,8 @@ void HSSim::monte_carlo_NpT(unsigned steps,unsigned frames,double step_size,doub
 		}
 	  }
 	}
-	cout << "Tested " << overlap_tests << " configutations and found " << overlap_hits_before << " before neighbour list updates (NLU)" << endl;
+	cout << "Tested " << overlap_tests << " configutations for overlaps and found ";
+	cout << overlap_hits_before << " before neighbour list updates (NLU)" << endl;
 	cout <<         "  and " << overlap_hits_after << " after NLU." << endl;
 	cout << "Accepted " << attempts-rejected << " of " << attempts 
 	  << " MC move attempts (" << 100.0*(1.0-(double)rejected/(double)attempts) << "%)" << endl;

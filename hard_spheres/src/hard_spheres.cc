@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	double neighbour_cutoff=1.7;
 	string ofilename = "traj.xyz";
 	double pressure = 1.0;
-	double volume_step = 0.0;
+	double volume_step = 0.0;  // Performe NVT if the volume_step is zero.
 
 	// Handle command line options
 	vector<string> vecstr;
@@ -63,22 +63,22 @@ int main(int argc, char **argv) {
 			break;*/
 		case 'h':
 			cout << endl;
-			cout << "      Simulation of hard-spheres, by Ulf R. Pedersen (http://urp.dk)." << endl << endl;
-			cout << " -h, --help                       Prints this help." << endl;
-			cout << " -q, --quiet                      Hide program output." << endl;
-			cout << " -r, --rcut=NUM        [1.7]      Neighbour cut-off distance." << endl;
-			cout << " -i, --input=FILE      [none]     Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
-			cout << "                                    Default [none]: an ideal gas configuration." << endl;
-			cout << " -t, --time_steps=INT  [20]       Time steps per frame." << endl;
-			cout << " -f, --frames=INT      [250]      Number of frames." << endl;
-			cout << " .s, --step_length=NUM [0.05]      The maximum particle step length." << endl;
-			cout << " -L, --Lenghts=NUM     [10]          Size of periodic box," << endl;
+			cout << "      Simulation of hard-spheres, by Ulf R. Pedersen (http://urp.dk, 2018)." << endl << endl;
+			cout << " -h, --help                        Prints this help." << endl;
+			cout << " -q, --quiet                       Hide program output." << endl;
+			cout << " -r, --rcut=NUM        [1.7]       Neighbour list cut-off distance." << endl;
+			cout << " -i, --input=FILE      [none]      Input file (*.xyz, *.xyz.gz or *.atom)." << endl;
+			cout << "                                     Default [none]: an ideal gas configuration." << endl;
+			cout << " -t, --time_steps=INT  [20]        Monte-Carlo time steps per frame." << endl;
+			cout << " -f, --frames=INT      [250]       Number of frames." << endl;
+			cout << " -s, --step_length=NUM [0.05]      The maximum particle Monte-Carlo step length." << endl;
+			cout << " -L, --Lenghts=NUM     [10]        Size of periodic box," << endl;
 			cout << "     --Lenghts=NUM,NUM,NUM           used when not provided in the input file." << endl;
-			cout << " -p, --pressure=NUM    [1.0]       Pressure for barostat (if applied)." << endl;
-			cout << " -v, --volume_step=NUM [0.0]       Volume step for barostat (if applied)." << endl;
-			cout << "                                     The default is 0.0 resulting in a NVT simulation" << endl;
+			cout << " -p, --pressure=NUM    [1.0]       Pressure for Monte-Carlo barostat (if applied)," << endl;
+			cout << "                                     by default the program runs a NVT simulation." << endl;
+			cout << " -v, --volume_step     [0.01]      Max step size in log(V) for Monte-Carlo barostat." << endl;
 			cout << " -o, --output=FILE     [traj.xyz]  Output file for trajectory (*.xyz or *.xyz.gz)." << endl << endl;
-			cout << "  Documentation and source code on github: https://github.com/urpedersen/URPTools " << endl << endl;
+			cout << "  Documentation and source code at: http://urp.dk/tools " << endl << endl;
 			exit(0);
 			break;
 		case 'q':
@@ -116,6 +116,7 @@ int main(int argc, char **argv) {
 			break;
 		case 'p':
 			pressure = atof(optarg);
+			if(volume_step==0.0) volume_step=0.01;
 			break;
 		case 'v':
 			volume_step = atof(optarg);
