@@ -19,7 +19,7 @@ The below information is available with the `-h` switch:
                                      Default [none]: an ideal gas configuration.
  -t, --time_steps=INT  [20]        Monte-Carlo time steps per frame.
  -f, --frames=INT      [250]       Number of frames.
- .s, --step_length=NUM [0.05]      The maximum particle Monte-Carlo step length.
+ -s, --step_length=NUM [0.05]      The maximum particle Monte-Carlo step length.
  -L, --Lenghts=NUM     [10]        Size of periodic box,
      --Lenghts=NUM,NUM,NUM           used when not provided in the input file.
  -p, --pressure=NUM    [1.0]       Pressure for Monte-Carlo barostat (if applied),
