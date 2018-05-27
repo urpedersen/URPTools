@@ -9,6 +9,7 @@ This program is currently in development ...
 The below information is available with the `-h` switch:
 
 ```
+
       Simulation of hard-spheres, by Ulf R. Pedersen (http://urp.dk).
 
  -h, --help                       Prints this help.
@@ -18,15 +19,16 @@ The below information is available with the `-h` switch:
                                     Default [none]: an ideal gas configuration.
  -t, --time_steps=INT  [20]       Time steps per frame.
  -f, --frames=INT      [250]      Number of frames.
- .s, --step_length=NUM [0.05]      The maximum particle step length.
- -L, --Lenghts=NUM     [10]          Size of periodic box,
+ .s, --step_length=NUM [0.05]     The maximum particle step length.
+ -L, --Lenghts=NUM     [10]       Size of periodic box,
      --Lenghts=NUM,NUM,NUM           used when not provided in the input file.
  -p, --pressure=NUM    [1.0]       Pressure for barostat (if applied).
- -v, --volume_step=NUM [0.0]       Volume step for barostat (if applied).
-                                     The default is 0.0 resulting in a NVT simulation
+                                     By default the program run a NVT simulation.
+ -v, --volume_step     [0.0]       Max step size in log(V) for barostat.
  -o, --output=FILE     [traj.xyz]  Output file for trajectory (*.xyz or *.xyz.gz).
 
-  Documentation and source code on github: https://github.com/urpedersen/URPTools 
+  Documentation and source code at: http://urp.dk/tools 
+
 ```
 
 ## Error handling
